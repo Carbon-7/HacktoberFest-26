@@ -222,7 +222,7 @@ HacktoberFest-26/
 
 ## 8. Authors & Credits
 
-* **Maintainer & Author:** [HacktoberFest-26 Team](https://github.com/Carbon-7/HacktoberFest-26)
+* **Maintainer & Author:** [Kavan Raval](https://github.com/Carbon-7/HacktoberFest-26)
 * **Event:** Hacktoberfest Hack Day 2026 (Major League Hacking)
 * **Model:** Google Gemma 4 (Google DeepMind)
 * **Local Inference:** Ollama Project
