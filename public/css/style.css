@@ -872,6 +872,35 @@ body {
   font-weight: 450;
 }
 
+/* Mermaid Visual Diagrams */
+.diagram-card {
+  border-left: 3.5px solid var(--accent-blue);
+}
+
+.mermaid-diagram-container {
+  margin-top: 0.85rem;
+  padding: 1.25rem 1rem;
+  background: #FFFFFF;
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  min-height: 120px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.mermaid-diagram-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+[data-theme="dark"] .mermaid-diagram-container {
+  background: rgba(18, 20, 26, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 /* Checklist Items */
 .action-checklist-group {
   display: flex;

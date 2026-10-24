@@ -600,6 +600,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            image: thumb,
             question: q,
             context: `Title: ${data.title}\nCategory: ${data.category}\nSummary: ${data.plainSummary}`,
             history

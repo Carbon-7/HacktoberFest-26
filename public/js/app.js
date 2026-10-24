@@ -58,6 +58,8 @@ class GemmaLensApp {
     this.previewImage = document.getElementById('previewImage');
     this.plainExplanation = document.getElementById('plainExplanation');
     this.checklistGroup = document.getElementById('checklistGroup');
+    this.diagramCard = document.getElementById('diagramCard');
+    this.mermaidDiagramContainer = document.getElementById('mermaidDiagramContainer');
     this.metricsPillGrid = document.getElementById('metricsPillGrid');
     this.alertCardWarning = document.getElementById('alertCardWarning');
     this.alertTitle = document.getElementById('alertTitle');
@@ -751,6 +753,9 @@ class GemmaLensApp {
       });
     }
 
+    // Visual Process & Architecture Diagram (Mermaid)
+    this.renderDiagramSection(data);
+
     // Key Details Grid
     this.metricsPillGrid.innerHTML = '';
     if (data.keyDetails && data.keyDetails.length > 0) {
@@ -836,6 +841,24 @@ class GemmaLensApp {
           description: 'Official recalls, warnings, and patient information'
         }
       ];
+    } else if (/contract|hr|employment|offer|legal/i.test(category) || /contract|employment/i.test(title)) {
+      return [
+        {
+          title: 'US Department of Labor Overtime & Exemption Rules',
+          url: 'https://www.dol.gov/agencies/whd/overtime',
+          description: 'Fair Labor Standards Act guidelines on mandatory overtime and salary exemptions'
+        },
+        {
+          title: 'FTC Non-Compete Clause Overview & Worker Protection',
+          url: 'https://www.ftc.gov/legal-library/browse/rules/noncompete-rule',
+          description: 'Official guidelines on post-employment covenants and restrictive clauses'
+        },
+        {
+          title: 'Worker.gov Federal Workplace Rights Hub',
+          url: 'https://www.worker.gov',
+          description: 'Federal worker protections, wage laws, and intellectual property limits'
+        }
+      ];
     } else if (/bill|notice|civic/i.test(category)) {
       return [
         {
@@ -849,6 +872,19 @@ class GemmaLensApp {
           description: 'Check official government utility subsidies and grants'
         }
       ];
+    } else if (/developer|code|system|traceback/i.test(category)) {
+      return [
+        {
+          title: 'Redis Connection Pooling & Timeout Best Practices',
+          url: 'https://redis.io/docs/latest/develop/connect/clients/',
+          description: 'Managing connection exhaustion and microservice timeout failovers'
+        },
+        {
+          title: 'MDN Web Docs: HTTP 504 Gateway Timeout',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504',
+          description: 'Diagnosing upstream proxy and microservice connection bottlenecks'
+        }
+      ];
     } else if (/food|allergen|label/i.test(category)) {
       return [
         {
@@ -857,8 +893,176 @@ class GemmaLensApp {
           description: 'Official Food Allergen Labeling & Consumer Protection standard'
         }
       ];
+    } else if (/stock|market|finance|chart/i.test(category)) {
+      return [
+        {
+          title: 'SEC EDGAR Corporate Filings Search',
+          url: 'https://www.sec.gov/edgar/searchedgar/companysearch',
+          description: 'Official 10-Q and 10-K financial disclosures directly from regulators'
+        },
+        {
+          title: 'Investopedia: Resistance, Support & Breakout Analysis',
+          url: 'https://www.investopedia.com/terms/r/resistance.asp',
+          description: 'Technical chart patterns and risk management guidelines'
+        }
+      ];
     }
     return [];
+  }
+
+  sanitizeMermaid(code) {
+    if (!code) return '';
+    return code
+      .replace(/\[([^"\]\n]+?)\]/g, (match, label) => {
+        if (/[()":;,/]/.test(label) && !label.startsWith('"')) {
+          return `["${label.replace(/"/g, "'")}"]`;
+        }
+        return match;
+      })
+      .replace(/\{([^"\}\n]+?)\}/g, (match, label) => {
+        if (/[()":;,/]/.test(label) && !label.startsWith('"')) {
+          return `{"${label.replace(/"/g, "'")}"}`;
+        }
+        return match;
+      });
+  }
+
+  getDomainFallbackDiagram(data) {
+    const cat = (data.category || '').toLowerCase();
+    const title = (data.title || '').toLowerCase();
+
+    if (cat.includes('contract') || cat.includes('legal') || cat.includes('hr') || title.includes('contract') || title.includes('employment') || title.includes('offer')) {
+      return `graph TD
+  A["Offer Letter & Contract Terms"] --> B{"Clause 4.2: Work Hours"}
+  B -->|Exempt Classification| C["Uncompensated Weekend & Late Hours"]
+  A --> D{"Clause 3.4: Bonus Terms"}
+  D -->|24-Month Clawback| E["100% Repayment Required if Leaving Early"]
+  A --> F{"Clause 8.3: IP Assignment"}
+  F -->|Overreaching| G["Personal Side Projects Assigned to Company"]
+  A --> H{"Clause 7.1: Non-Compete"}
+  H -->|18-Month Restriction| I["Prevents Freelance & Industry Roles"]
+  C --> J["Risk: High - Uncompensated Overtime"]
+  E --> K["Risk: High - Financial Handcuff"]
+  G --> L["Action: Request IP Carve-Out Rider"]
+  style C fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style E fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style G fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style I fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style L fill:#DDF4FF,stroke:#0969DA,stroke-width:2px`;
+    } else if (cat.includes('developer') || cat.includes('code') || cat.includes('tech') || title.includes('gateway') || title.includes('timeout')) {
+      return `graph LR
+  Client["Client Traffic"] --> APIGW["API Gateway"]
+  APIGW --> NodeService["Node.js Microservice"]
+  NodeService -->|Connection Timeout: 504| RedisPool["Redis Cluster"]
+  RedisPool -.->|1024/1024 Connections Exhausted| DB[("PostgreSQL Master")]
+  style RedisPool fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style NodeService fill:#FFF8C5,stroke:#9A6700,stroke-width:2px
+  style APIGW fill:#DDF4FF,stroke:#0969DA,stroke-width:2px`;
+    } else if (cat.includes('tutor') || cat.includes('acad') || cat.includes('math') || cat.includes('physics') || title.includes('kinematics')) {
+      return `graph TD
+  Initial["Launch Velocity v0 & Angle theta"] --> CompX["Horizontal: vx = v0 cos theta"]
+  Initial --> CompY["Vertical: vy = v0 sin theta"]
+  CompX --> Range["Horizontal Range: R = (v0² sin 2theta) / g"]
+  CompY --> Apex["Apex Max Height: H = (v0² sin² theta) / (2g)"]
+  CompY --> Time["Total Flight Time: T = (2 v0 sin theta) / g"]
+  style Initial fill:#F6F8FA,stroke:#57604A,stroke-width:1px
+  style Range fill:#DDF4FF,stroke:#0969DA,stroke-width:2px
+  style Apex fill:#E6FFED,stroke:#1A7F37,stroke-width:2px`;
+    } else if (cat.includes('guide') || cat.includes('transit') || cat.includes('travel') || title.includes('flight') || title.includes('boarding')) {
+      return `graph LR
+  Arr["Flight SFO-HND Terminal 3"] --> Customs["International Customs & Quarantine: 45 min"]
+  Customs --> Monorail["Transit to Terminal 1: 15 min"]
+  Monorail --> Security["Domestic Security Check: 20 min"]
+  Security --> Gate["Departure Gate 64: 80 min Required"]
+  style Gate fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style Monorail fill:#FFF8C5,stroke:#9A6700,stroke-width:2px
+  style Customs fill:#DDF4FF,stroke:#0969DA,stroke-width:2px`;
+    } else if (cat.includes('stock') || cat.includes('market') || cat.includes('trade') || title.includes('earnings') || title.includes('candlestick')) {
+      return `graph TD
+  Stock["NVST Cloud Financial Flow"] --> Rev["Q3 Revenue: $842M +28% YoY"]
+  Stock --> Cash["Free Cash Flow: $184M"]
+  Stock --> Chart["Technical Chart Setup"]
+  Chart --> Resist["Key Resistance: $148.50 High-Volume Wall"]
+  Chart --> Support["Base Support: $132.00 50-Day EMA"]
+  style Resist fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style Support fill:#E6FFED,stroke:#1A7F37,stroke-width:2px
+  style Rev fill:#DDF4FF,stroke:#0969DA,stroke-width:2px`;
+    } else if (cat.includes('bill') || cat.includes('utility') || cat.includes('notice')) {
+      return `graph TD
+  Bill["Pacific Power Statement"] --> PastDue["Past Due Balance: $148.20"]
+  Bill --> Current["Current Billing Period: $94.65"]
+  PastDue --> Disconnect["Disconnection Threshold: 14 Days Notice"]
+  Disconnect --> Urgent["Action: Pay Past Due $148.20 to Avoid Shutoff"]
+  style Disconnect fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style Urgent fill:#FFF8C5,stroke:#9A6700,stroke-width:2px`;
+    } else if (cat.includes('health') || cat.includes('medic') || cat.includes('rx')) {
+      return `graph TD
+  Med["Amoxicillin 500mg Course"] --> Dose1["Morning: 1 Capsule with Meal"]
+  Med --> Dose2["Afternoon: 1 Capsule with Water"]
+  Med --> Dose3["Night: 1 Capsule at Bedtime"]
+  Med --> Warn["Do Not Stop Early: Complete Full 10 Days"]
+  style Warn fill:#FFEBE9,stroke:#CF222E,stroke-width:2px
+  style Dose1 fill:#DDF4FF,stroke:#0969DA,stroke-width:1px
+  style Dose2 fill:#DDF4FF,stroke:#0969DA,stroke-width:1px
+  style Dose3 fill:#DDF4FF,stroke:#0969DA,stroke-width:1px`;
+    }
+    return '';
+  }
+
+  renderDiagramSection(data) {
+    if (!this.diagramCard || !this.mermaidDiagramContainer) return;
+
+    let diagramCode = '';
+
+    // Check if Gemma 4 provided a diagram
+    if (data.mermaidDiagram && typeof data.mermaidDiagram === 'string' && data.mermaidDiagram.trim().length > 10) {
+      diagramCode = data.mermaidDiagram.trim()
+        .replace(/^```mermaid\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '')
+        .trim();
+    }
+
+    if (!diagramCode) {
+      diagramCode = this.getDomainFallbackDiagram(data);
+    }
+
+    if (!diagramCode) {
+      this.diagramCard.style.display = 'none';
+      return;
+    }
+
+    const cleanCode = this.sanitizeMermaid(diagramCode);
+
+    if (window.mermaid) {
+      const diagramId = 'mermaid_svg_' + Date.now();
+      window.mermaid.render(diagramId, cleanCode)
+        .then(result => {
+          this.mermaidDiagramContainer.innerHTML = result.svg;
+          this.diagramCard.style.display = 'block';
+        })
+        .catch(err => {
+          console.warn('Mermaid render error, attempting domain fallback diagram:', err);
+          const fallback = this.getDomainFallbackDiagram(data);
+          if (fallback && fallback !== cleanCode) {
+            const fallbackId = 'mermaid_fallback_' + Date.now();
+            window.mermaid.render(fallbackId, fallback)
+              .then(res => {
+                this.mermaidDiagramContainer.innerHTML = res.svg;
+                this.diagramCard.style.display = 'block';
+              })
+              .catch(() => {
+                this.mermaidDiagramContainer.innerHTML = `<pre style="font-size: 0.8rem; background: #fff; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #333;">${this.escapeHtml(cleanCode)}</pre>`;
+                this.diagramCard.style.display = 'block';
+              });
+          } else {
+            this.mermaidDiagramContainer.innerHTML = `<pre style="font-size: 0.8rem; background: #fff; padding: 1rem; border-radius: 8px; overflow-x: auto; color: #333;">${this.escapeHtml(cleanCode)}</pre>`;
+            this.diagramCard.style.display = 'block';
+          }
+        });
+    } else {
+      this.diagramCard.style.display = 'none';
+    }
   }
 
   async submitFollowUpQuestion() {

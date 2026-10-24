@@ -6,13 +6,13 @@
 [![Inference](https://img.shields.io/badge/Inference-Local%20Ollama-green.svg)](https://ollama.com/)
 [![Extension](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blueviolet.svg)](#7-chrome-extension-companion)
 
-An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens automatically detects and demystifies physical documents, medicine labels, utility bills, and food packaging into clear everyday language with one-click voice narration, follow-up Q&A, and persistent scan history.
+An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens automatically detects and demystifies physical documents, predatory HR employment contracts, medical prescriptions, utility bills, cloud system traces, and physics derivations into clear everyday language with interactive Mermaid.js visual flowcharts, one-click voice narration, follow-up Q&A, and persistent scan history.
 
 ---
 
 ## Interface Overview
 
-| Home & Sample Gallery | Auto-Detected Analysis & Checklist |
+| Home & 8-Domain Sample Gallery | Auto-Detected Analysis & Mermaid Flowchart |
 | :---: | :---: |
 | ![Home Interface](docs/screenshots/home.png) | ![Analysis Results](docs/screenshots/results.png) |
 
@@ -20,35 +20,38 @@ An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B
 
 ## 1. What Does It Do, and For Whom?
 
-Dense paperwork, confusing packaging, and intimidating technical diagrams create everyday barriers for millions:
+Dense paperwork, confusing packaging, deceptive employment contracts, and intimidating technical diagrams create everyday barriers for millions:
+* **Job seekers and tech professionals** receive 15+ page employment contracts with buried fine-print traps: mandatory uncompensated weekend deployments, 24-month bonus clawback handcuffs, broad IP assignment over private evening side-projects, and restrictive non-competes.
 * **Patients and elderly citizens** struggle with small print on medicine containers, confusing dosing schedules, and unnoticed allergy contraindications.
 * **Ordinary citizens and tenants** face high stress deciphering utility bills, disconnect notices, and administrative penalties.
-* **Consumers and families** need immediate clarity on allergen warnings, cross-contamination statements, and hidden dietary risks.
-* **Developers, students, and travelers** need instant, grounded visual explanations for architecture schematics, foreign transit maps, math proofs, and balance sheets.
+* **Developers, students, and travelers** need instant, grounded visual explanations for architecture schematics, server timeouts, foreign transit maps, math proofs, and balance sheets.
 
-**GemmaLens** eliminates manual mode selection. A user simply drops a PDF document, image, or snapshot. The system **automatically classifies the domain**, translates it into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
+**GemmaLens** eliminates manual mode selection. A user simply drops a PDF document, image, or snapshot. The system **automatically classifies the domain**, translates it into plain language, extracts key details, highlights essential action items, compiles an interactive **Mermaid.js visual diagram**, and reads the summary aloud via browser speech synthesis.
 
 ### The X-Factor: Why GemmaLens Surpasses Generic Chat Apps
 Why use GemmaLens instead of pasting into a generic cloud chatbot?
 
 | Feature | Generic Cloud Chat Apps (ChatGPT / Claude) | GemmaLens Universal Visual Assistant |
 | :--- | :--- | :--- |
-| **Data Privacy & Compliance** | Cloud data leakage; exposes confidential prescriptions, bank accounts, and tax forms to external servers. | **100% Local Inference:** Powered by Google Gemma 4 on local Ollama (`localhost:11434`). Zero cloud dependencies; sensitive documents never leave your device. |
-| **User Experience & Output** | Wall of text; requires typing prompts and manual reading. | **Action-Oriented Cognitive Layout:** Automatic classification, interactive checklist with checkboxes, severe warning banners, and key metric cards. |
-| **Browser Integration** | Requires switching tabs, saving screenshots, and uploading files. | **Native Chrome Side Panel Companion:** Docks right next to your active tab with a **Resizable Snipping Tool** to crop any specific paragraph, chart, or bill line with live sync to the main app. |
+| **Data Privacy & Compliance** | Cloud data leakage; exposes confidential offer letters, prescriptions, bank accounts, and tax forms to external servers. | **100% Local Inference:** Powered by Google Gemma 4 on local Ollama (`localhost:11434`). Zero cloud dependencies; sensitive contracts and health documents never leave your device. |
+| **HR Contract Trap Analyzer** | Generic summaries that miss buried legal conditions. | **Dedicated Fine-Print Scrutiny:** Isolates uncompensated overtime (exempt classification), 24-month bonus clawbacks, broad personal IP claims, and non-compete covenants with risk trees. |
+| **Visual Architecture & Flowcharts** | Plain text walls; no visual layout. | **Interactive Mermaid.js Engine:** Teaches Gemma to synthesize decision trees, failure graphs, and formula derivations rendered directly as interactive SVG diagrams. |
+| **User Experience & Output** | Unstructured markdown; requires typing prompts and manual reading. | **Action-Oriented Cognitive Layout:** Automatic classification, interactive checklist with checkboxes, severe warning banners, and key metric cards. |
+| **Browser Integration** | Requires switching tabs, saving screenshots, and uploading files. | **Native Chrome Side Panel Companion:** Docks right next to your active tab with a **Resizable Snipping Tool** to crop any specific paragraph, contract clause, or chart with live sync to the main app. |
 | **Accessibility & Narration** | Static robotic voice or none. | **Speech-Reactive Soundwave:** Web Speech API boundary-driven audio equalizer with live rhythm tracking, custom voice picker, and speed/pitch tuning. |
 | **Document Support** | Limited image uploads. | **High-DPI PDF & Multi-Format:** Native in-browser PDF rendering via PDF.js for crisp character recognition on multipage documents. |
-| **Civic & Regional Grounding** | Generic hallucinated advice. | **Contextual Civic Routing:** Recommends verified local support bodies (e.g. LIHEAP energy assistance, NHS advice, CFPB consumer complaints, MedlinePlus). |
+| **Civic & Regional Grounding** | Generic hallucinated advice. | **Contextual Civic Routing:** Recommends verified government and regulatory bodies (e.g. US Dept of Labor Overtime Rules, FTC Non-Compete guides, LIHEAP energy assistance, FDA, MedlinePlus). |
 
-### Multi-Domain Intelligence Roles
-GemmaLens dynamically adapts its cognitive role based on the visual input:
-1. **Prescription & Medicine:** Extracts dosing, timing, severe contraindications, and food instructions.
-2. **Financial, Utility & Legal Simplifier:** Dissects complex contracts, eviction warnings, and payment penalties, linking to regional aid bodies.
-3. **Developer & System Architecture Tutor:** Explains error stack traces, database ERDs, terminal logs, and system schematics.
-4. **Academic & Intuitive Tutor:** Transforms complex math formulas, physics diagrams, and textbook pages into step-by-step intuitive analogies.
-5. **Trip Planner & Local Transit Guide:** Translates foreign subway maps, street signs, and restaurant menus with dietary warnings.
-6. **Stocks & Markets Interpreter:** Summarizes quarterly earnings slides, balance sheets, candlestick patterns, and financial risk disclosures.
-7. **Food & Allergen Safety Lens:** Flags allergen cross-contamination and nutritional highlights.
+### 8 Multi-Domain Intelligence Roles & Instant Demo Presets
+GemmaLens dynamically adapts its cognitive role based on the visual input, supported by 8 built-in sample presets:
+1. **HR Employment Contract & Offer Letter:** Identifies uncompensated weekend shifts, 24-month bonus clawbacks, 18-month non-competes, and private side-project IP clauses.
+2. **Prescription & Medicine Label:** Extracts dosing schedules, food timing, severe contraindications, and course completion rules.
+3. **Developer & Cloud System Traceback:** Diagnoses 504 Gateway Timeouts, Redis connection pool exhaustion (1024/1024), and microservice failure paths.
+4. **Academic & Physics Tutor:** Explains projectile kinematics, horizontal range equations $R = \frac{v_0^2 \sin 2\theta}{g}$, and max height derivations.
+5. **Flight Transit & Travel Guide:** Calculates tight terminal transfer times (SFO -> HND), customs clearance buffers, and boarding deadlines.
+6. **Stocks & Financial Markets:** Interprets quarterly earnings slides, free cash flow, and 90-day candlestick resistance levels.
+7. **Utility Statement & Shutoff Notice:** Flags disconnection grace periods, past-due balances, and official government assistance portals.
+8. **Food & Allergen Safety Label:** Detects hidden tree nuts, cross-contamination statements, and dietary allergens.
 
 ---
 
@@ -60,6 +63,8 @@ GemmaLens relies entirely on open-source technologies with zero cloud dependenci
   * Native multimodal capability using a 478M parameter CLIP vision projector.
   * 131k context window for comprehensive document context.
   * Released under the Apache 2.0 license.
+* **Visual Diagram Synthesis (Mermaid.js):**
+  * Gemma 4 is instructed to construct valid, structured Mermaid flowchart and graph definitions representing decision trees, state machines, and system connections.
 * **Local Inference Runtime:** **Ollama** (`localhost:11434`)
   * 100% private and offline-capable. Sensitive personal health documents and household bills never leave the local machine.
 * **Cognitive Reasoning Transparency:**

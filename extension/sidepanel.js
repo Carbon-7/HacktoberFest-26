@@ -445,6 +445,7 @@ function setupQnA() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          image: currentScan.imageThumbnail || '',
           question,
           context: `Title: ${currentScan.title}\nCategory: ${currentScan.category}\nSummary: ${currentScan.plainSummary}`,
           history: conversationHistory

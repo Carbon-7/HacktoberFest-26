@@ -11,3 +11,8 @@ arch.md
 MEMORY.md
 TASK.md
 test/
+
+# Pitch deck and presentation prompt files (do not push to repo)
+HACKATHON_PITCH_DECK.md
+PRESENTATION_DECK.md
+*.ppt.md
