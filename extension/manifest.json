@@ -1,16 +1,18 @@
 {
   "manifest_version": 3,
   "name": "GemmaLens — Universal Visual Assistant",
-  "version": "1.2.0",
-  "description": "Chrome Side Panel companion for GemmaLens. Snapshots webpages, crops specific zones with a resizable snipping tool, and syncs seamlessly with GemmaLens.",
+  "version": "1.3.0",
+  "description": "Chrome Side Panel companion for GemmaLens. Docks alongside any webpage with an interactive resizable snipping tool, multi-domain intelligence skills, and 1-click sync.",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "tabs"
   ],
   "host_permissions": [
-    "http://localhost:3000/*"
+    "http://localhost:3000/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"

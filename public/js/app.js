@@ -452,6 +452,30 @@ class GemmaLensApp {
         localStorage.setItem('gemmalens_region', e.target.value);
       });
     }
+
+    // AI Model & Inference Provider Settings
+    this.settingsModelSelect = document.getElementById('settingsModelSelect');
+    this.settingsEndpointInput = document.getElementById('settingsEndpointInput');
+    
+    if (this.settingsModelSelect) {
+      const savedModel = localStorage.getItem('gemmalens_model') || 'gemma4';
+      this.settingsModelSelect.value = savedModel;
+      this.settingsModelSelect.addEventListener('change', (e) => {
+        localStorage.setItem('gemmalens_model', e.target.value);
+        if (this.statusText) {
+          const mNames = { gemma4: 'Gemma 4 (7.5B)', nemotron: 'Nemotron 3.5 / 4B', custom: 'Custom Endpoint' };
+          this.statusText.textContent = (mNames[e.target.value] || e.target.value) + ' Active';
+        }
+      });
+    }
+
+    if (this.settingsEndpointInput) {
+      const savedEndpoint = localStorage.getItem('gemmalens_endpoint') || 'http://localhost:11434';
+      this.settingsEndpointInput.value = savedEndpoint;
+      this.settingsEndpointInput.addEventListener('change', (e) => {
+        localStorage.setItem('gemmalens_endpoint', e.target.value.trim());
+      });
+    }
   }
 
   applyScale(val) {
@@ -620,7 +644,9 @@ class GemmaLensApp {
 
     const payload = {
       image: this.currentImageBase64,
-      domainPreference: this.currentDomain || 'auto'
+      domainPreference: this.currentDomain || 'auto',
+      model: localStorage.getItem('gemmalens_model') || 'gemma4',
+      endpoint: localStorage.getItem('gemmalens_endpoint') || 'http://localhost:11434'
     };
 
     try {
@@ -671,6 +697,35 @@ class GemmaLensApp {
     this.resultTitle.textContent = data.title || 'Visual Analysis Result';
     this.resultCategoryBadge.textContent = data.category || result.category || 'Auto-Detected';
     this.previewImage.src = this.currentImageBase64;
+
+    // Auto-Highlight Matching Domain Skill
+    const cat = (data.category || result.category || '').toLowerCase();
+    const pills = document.querySelectorAll('.domain-pill');
+    pills.forEach((p) => {
+      const d = p.getAttribute('data-domain');
+      if (d === 'health' && (cat.includes('health') || cat.includes('medic') || cat.includes('rx') || cat.includes('pharma'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'finance' && (cat.includes('bill') || cat.includes('financ') || cat.includes('tax') || cat.includes('invoice'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'legal' && (cat.includes('legal') || cat.includes('contract') || cat.includes('law') || cat.includes('agreement'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'developer' && (cat.includes('code') || cat.includes('develop') || cat.includes('program') || cat.includes('tech'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'tutor' && (cat.includes('tutor') || cat.includes('acad') || cat.includes('math') || cat.includes('learn'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'guide' && (cat.includes('trip') || cat.includes('transit') || cat.includes('guide') || cat.includes('travel'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      } else if (d === 'stocks' && (cat.includes('stock') || cat.includes('market') || cat.includes('trade') || cat.includes('equity'))) {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      }
+    });
 
     // Plain Explanation
     this.plainExplanation.textContent = data.plainSummary || 'No summary available.';
@@ -832,7 +887,9 @@ class GemmaLensApp {
         body: JSON.stringify({
           image: this.currentImageBase64,
           previousAnalysis: this.currentAnalysisResult ? this.currentAnalysisResult.data : {},
-          question: question
+          question: question,
+          model: localStorage.getItem('gemmalens_model') || 'gemma4',
+          endpoint: localStorage.getItem('gemmalens_endpoint') || 'http://localhost:11434'
         })
       });
 

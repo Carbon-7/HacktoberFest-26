@@ -121,36 +121,38 @@
   toolbar.id = 'gemmalens-snip-toolbar';
   toolbar.style.cssText = `
     position: absolute;
-    bottom: -46px;
+    bottom: -48px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(24px);
     border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 999px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     display: none;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     z-index: 2147483646;
     pointer-events: auto;
   `;
   toolbar.innerHTML = `
-    <button id="glAnalyzeBtn" style="background:#0071E3; color:white; border:none; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px;">
+    <button id="glAnalyzeBtn" style="background:#0071E3; color:white; border:none; border-radius:999px; padding:6px 16px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <span>Analyze Selected Zone</span>
     </button>
-    <button id="glResetBtn" style="background:rgba(0,0,0,0.06); color:#1D1D1F; border:none; border-radius:999px; padding:6px 10px; font-size:11.5px; font-weight:600; cursor:pointer;">Redraw</button>
-    <button id="glCancelBtn" style="background:none; border:none; color:#8E8E93; font-size:16px; cursor:pointer; padding:0 6px;">&times;</button>
+    <button id="glResetBtn" style="background:rgba(0,0,0,0.06); color:#1D1D1F; border:none; border-radius:999px; padding:6px 12px; font-size:11.5px; font-weight:600; cursor:pointer;">Redraw</button>
+    <button id="glCancelBtn" style="background:none; border:none; color:#8E8E93; font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">&times;</button>
   `;
   box.appendChild(toolbar);
 
   overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  (document.documentElement || document.body).appendChild(overlay);
 
   // Geometry State
   let rect = { left: 0, top: 0, width: 0, height: 0 };
+  let startX = 0;
+  let startY = 0;
   let mode = 'drawing'; // 'drawing' | 'idle' | 'resizing' | 'moving'
   let activeHandle = null;
   let dragStartX = 0;
@@ -189,10 +191,12 @@
       return;
     }
 
-    // Otherwise, start drawing a new crop box
+    // Otherwise, start drawing a new crop box from fixed anchor
     mode = 'drawing';
-    rect.left = e.clientX;
-    rect.top = e.clientY;
+    startX = e.clientX;
+    startY = e.clientY;
+    rect.left = startX;
+    rect.top = startY;
     rect.width = 0;
     rect.height = 0;
     toolbar.style.display = 'none';
@@ -204,10 +208,10 @@
     if (mode === 'drawing') {
       const currentX = e.clientX;
       const currentY = e.clientY;
-      rect.left = Math.min(rect.left, currentX);
-      rect.top = Math.min(rect.top, currentY);
-      rect.width = Math.abs(currentX - rect.left);
-      rect.height = Math.abs(currentY - rect.top);
+      rect.left = Math.min(startX, currentX);
+      rect.top = Math.min(startY, currentY);
+      rect.width = Math.abs(currentX - startX);
+      rect.height = Math.abs(currentY - startY);
       updateBoxUI();
     } else if (mode === 'moving') {
       const dx = e.clientX - dragStartX;
@@ -250,15 +254,15 @@
 
   window.addEventListener('mouseup', () => {
     if (mode === 'drawing' || mode === 'resizing' || mode === 'moving') {
-      if (rect.width > 30 && rect.height > 30) {
+      if (rect.width >= 25 && rect.height >= 25) {
         toolbar.style.display = 'flex';
         // Adjust toolbar position if near bottom edge
         if (rect.top + rect.height + 60 > window.innerHeight) {
           toolbar.style.bottom = 'auto';
-          toolbar.style.top = '-46px';
+          toolbar.style.top = '-48px';
         } else {
           toolbar.style.top = 'auto';
-          toolbar.style.bottom = '-46px';
+          toolbar.style.bottom = '-48px';
         }
       } else {
         box.style.display = 'none';
@@ -286,7 +290,7 @@
   });
 
   document.getElementById('glAnalyzeBtn')?.addEventListener('click', () => {
-    if (rect.width < 30 || rect.height < 30) return;
+    if (rect.width < 25 || rect.height < 25) return;
 
     const dpr = window.devicePixelRatio || 1;
     const cropCoordinates = {
@@ -462,21 +466,31 @@
         })
       }).catch(console.warn);
 
+      const scanItem = {
+        id: sessionId,
+        sessionId: sessionId,
+        timestamp: new Date().toISOString(),
+        type: 'Snipped Zone',
+        title: data.title || 'Snipped Zone Analysis',
+        category: data.category || data.domainRole || 'Snipped Section',
+        plainSummary: data.plainSummary || '',
+        actionSteps: data.actionSteps || [],
+        criticalWarnings: data.criticalWarnings || [],
+        keyExtractedDetails: data.keyExtractedDetails || {},
+        audioScript: data.audioReadAloudScript || data.plainSummary || '',
+        imageThumbnail: thumb
+      };
+
+      // Broadcast to sidepanel if open
+      try {
+        chrome.runtime.sendMessage({ action: 'zoneAnalysisResult', scan: scanItem });
+      } catch (_) {}
+
       // Save to chrome storage
       try {
         chrome.storage.local.get({ scanHistory: [] }, (res) => {
           const list = res.scanHistory || [];
-          list.unshift({
-            id: sessionId,
-            timestamp: new Date().toISOString(),
-            type: 'Snipped Zone',
-            title: data.title || 'Snipped Zone Analysis',
-            category: data.category || 'Zone',
-            plainSummary: data.plainSummary || '',
-            actionSteps: data.actionSteps || [],
-            criticalWarnings: data.criticalWarnings || [],
-            imageThumbnail: thumb
-          });
+          list.unshift(scanItem);
           chrome.storage.local.set({ scanHistory: list.slice(0, 30) });
         });
       } catch (_) {}

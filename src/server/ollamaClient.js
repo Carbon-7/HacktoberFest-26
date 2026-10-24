@@ -101,18 +101,17 @@ export function parseModelJSON(text) {
 /**
  * Analyze an image with Gemma 4 Vision via Ollama.
  */
-export async function analyzeImageWithGemma4({ base64Image, prompt, model = DEFAULT_MODEL }) {
+export async function analyzeImageWithGemma4({ base64Image, prompt, model = DEFAULT_MODEL, endpoint = OLLAMA_BASE_URL }) {
   const startTime = Date.now();
   const cleanedImage = cleanBase64(base64Image);
 
-  if (!cleanedImage) {
-    throw new Error('Valid base64 image data is required');
-  }
+  // Sanitize model name if default or empty
+  const activeModel = (!model || model === 'gemma4') ? DEFAULT_MODEL : model;
+  const baseUrl = (endpoint || OLLAMA_BASE_URL).replace(/\/+$/, '');
 
   const payload = {
-    model: model,
+    model: activeModel,
     prompt: prompt,
-    images: [cleanedImage],
     stream: false,
     options: {
       temperature: 0.2, // Low temperature for high factual accuracy
@@ -120,7 +119,12 @@ export async function analyzeImageWithGemma4({ base64Image, prompt, model = DEFA
     }
   };
 
-  const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
+  // Only include images array if cleanedImage is available
+  if (cleanedImage) {
+    payload.images = [cleanedImage];
+  }
+
+  const response = await fetch(`${baseUrl}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)

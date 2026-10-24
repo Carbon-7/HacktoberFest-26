@@ -9,6 +9,7 @@ const BACKEND_URL = 'http://localhost:3000';
 
 let currentScan = null;
 let currentSessionId = null;
+let currentDomain = 'auto';
 let conversationHistory = [];
 let isSpeaking = false;
 let waveInterval = null;
@@ -47,12 +48,66 @@ const statusText = document.getElementById('statusText');
 document.addEventListener('DOMContentLoaded', () => {
   checkHealth();
   setupTabs();
+  setupSkills();
   setupCaptureActions();
   setupAudio();
   setupQnA();
   setupSync();
+  setupZoneListener();
   loadLatestScan();
 });
+
+// Setup Intelligence Skills Pills
+function setupSkills() {
+  const pills = document.querySelectorAll('.sp-skill-pill');
+  pills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      pills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentDomain = pill.getAttribute('data-domain') || 'auto';
+    });
+  });
+}
+
+function highlightSkillBadge(categoryName) {
+  if (!categoryName) return;
+  const lower = categoryName.toLowerCase();
+  const pills = document.querySelectorAll('.sp-skill-pill');
+  pills.forEach((p) => {
+    const d = p.getAttribute('data-domain');
+    if (d === 'health' && (lower.includes('health') || lower.includes('medic') || lower.includes('rx') || lower.includes('pharma'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'finance' && (lower.includes('bill') || lower.includes('financ') || lower.includes('tax') || lower.includes('invoice'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'legal' && (lower.includes('legal') || lower.includes('contract') || lower.includes('law') || lower.includes('agreement'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'developer' && (lower.includes('code') || lower.includes('develop') || lower.includes('program') || lower.includes('tech'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'tutor' && (lower.includes('tutor') || lower.includes('acad') || lower.includes('math') || lower.includes('learn'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'guide' && (lower.includes('trip') || lower.includes('transit') || lower.includes('guide') || lower.includes('travel'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    } else if (d === 'stocks' && (lower.includes('stock') || lower.includes('market') || lower.includes('trade') || lower.includes('equity'))) {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    }
+  });
+}
+
+function setupZoneListener() {
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === 'zoneAnalysisResult' && message.scan) {
+      renderScan(message.scan);
+      tabLive.click();
+    }
+  });
+}
 
 // 1. Health Check
 async function checkHealth() {
@@ -95,6 +150,24 @@ function setupTabs() {
   });
 }
 
+// Helper: Query active web tab
+async function getActiveWebTab() {
+  try {
+    let tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    if (!tabs || tabs.length === 0 || !tabs[0].id) {
+      tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    }
+    for (const t of (tabs || [])) {
+      if (t.url && !t.url.startsWith('chrome://') && !t.url.startsWith('chrome-extension://') && !t.url.startsWith('about:') && !t.url.startsWith('edge://')) {
+        return t;
+      }
+    }
+    return tabs && tabs[0] ? tabs[0] : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 // 3. Actions: Capture Page, Resizable Snipping, Dropzone
 function setupCaptureActions() {
   // Capture Full Webpage
@@ -114,8 +187,26 @@ function setupCaptureActions() {
   });
 
   // Resizable Snipping Tool
-  snipZoneBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'startZoneCrop' });
+  snipZoneBtn.addEventListener('click', async () => {
+    try {
+      const tab = await getActiveWebTab();
+      if (!tab || !tab.id) {
+        alert('Please open or focus a website tab first (e.g. localhost:3000 or any webpage). Snipping tool runs directly on normal websites.');
+        return;
+      }
+
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['crop.js']
+      });
+    } catch (err) {
+      console.warn('Direct scripting failed, attempting background fallback:', err);
+      chrome.runtime.sendMessage({ action: 'startZoneCrop' }, (res) => {
+        if (res && !res.success) {
+          alert('Could not start snipping: ' + (res.error || 'Unknown error'));
+        }
+      });
+    }
   });
 
   // Local File / PDF upload in Side Panel
@@ -136,7 +227,10 @@ async function processImageAnalysis(imageBase64, sourceLabel) {
     const response = await fetch(`${BACKEND_URL}/api/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: imageBase64 })
+      body: JSON.stringify({
+        image: imageBase64,
+        domainPreference: currentDomain || 'auto'
+      })
     });
 
     const res = await response.json();
@@ -199,6 +293,7 @@ function renderScan(scan) {
 
   resCategory.textContent = scan.category || 'Document';
   resTitle.textContent = scan.title || 'Page Analysis';
+  highlightSkillBadge(scan.category);
   resSummary.textContent = scan.plainSummary || 'Analyzed successfully.';
 
   // Critical Warnings

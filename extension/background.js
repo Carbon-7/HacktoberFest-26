@@ -3,49 +3,67 @@
  * Coordinates side panel opening, tab captures, and resizable snipping tool injection.
  */
 
-// Configure action click to immediately open the Chrome Side Panel
-chrome.sidePanel
-  ?.setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((err) => console.warn('Side panel behavior setup:', err));
+// Enable action click to open side panel automatically
+function initSidePanelBehavior() {
+  if (chrome.sidePanel && chrome.sidePanel.setPanelBehavior) {
+    chrome.sidePanel
+      .setPanelBehavior({ openPanelOnActionClick: true })
+      .catch((err) => console.warn('Side panel behavior setup:', err));
+  }
+}
+
+initSidePanelBehavior();
+chrome.runtime.onInstalled.addListener(initSidePanelBehavior);
+
+// Fallback action click handler
+chrome.action.onClicked.addListener(async (tab) => {
+  if (chrome.sidePanel && chrome.sidePanel.open) {
+    try {
+      await chrome.sidePanel.open({ windowId: tab.windowId });
+    } catch (err) {
+      console.warn('Could not open side panel directly:', err);
+    }
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'startZoneCrop') {
-    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    chrome.tabs.query({ active: true, lastFocusedWindow: true }, async (tabs) => {
       if (!tabs || tabs.length === 0) {
         sendResponse({ success: false, error: 'No active tab found' });
         return;
       }
-      const tabId = tabs[0].id;
+      const targetTab = tabs[0];
       try {
         await chrome.scripting.executeScript({
-          target: { tabId },
+          target: { tabId: targetTab.id },
           files: ['crop.js']
         });
-        sendResponse({ success: true });
+        sendResponse({ success: true, tabId: targetTab.id });
       } catch (err) {
         console.error('Failed to inject resizable snipping tool:', err);
         sendResponse({ success: false, error: err.message });
       }
     });
-    return true;
+    return true; // Keep message port open for async response
   }
 
   if (message.action === 'captureTab') {
-    chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+    const targetWinId = sender?.tab?.windowId || null;
+    chrome.tabs.captureVisibleTab(targetWinId, { format: 'png' }, (dataUrl) => {
       if (chrome.runtime.lastError || !dataUrl) {
-        sendResponse({ success: false, error: chrome.runtime.lastError?.message || 'Failed to capture visible tab' });
+        // Fallback with null windowId
+        chrome.tabs.captureVisibleTab(null, { format: 'png' }, (fallbackUrl) => {
+          if (chrome.runtime.lastError || !fallbackUrl) {
+            sendResponse({ success: false, error: chrome.runtime.lastError?.message || 'Failed to capture visible tab' });
+          } else {
+            sendResponse({ success: true, dataUrl: fallbackUrl });
+          }
+        });
       } else {
         sendResponse({ success: true, dataUrl });
       }
     });
-    return true;
-  }
-
-  if (message.action === 'openAppWithSync') {
-    const sessionId = message.sessionId;
-    const url = sessionId ? `http://localhost:3000/?session=${sessionId}` : 'http://localhost:3000';
-    chrome.tabs.create({ url });
-    sendResponse({ success: true });
     return true;
   }
 });

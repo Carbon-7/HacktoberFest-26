@@ -111,7 +111,7 @@ app.get('/api/sync-session/:id', (req, res) => {
  * Analyzes an uploaded image, PDF snapshot, or preset with Gemma 4 using multi-domain auto-detection.
  */
 app.post('/api/analyze', async (req, res) => {
-  const { image, query = '', domainPreference = '', model } = req.body;
+  const { image, query = '', domainPreference = '', model, endpoint } = req.body;
 
   if (!image) {
     return res.status(400).json({
@@ -125,7 +125,8 @@ app.post('/api/analyze', async (req, res) => {
     const result = await analyzeImageWithGemma4({
       base64Image: image,
       prompt: prompt,
-      model: model || 'gemma4'
+      model: model || 'gemma4',
+      endpoint: endpoint
     });
 
     const category = result.data.category || 'General Visual Document';
@@ -154,7 +155,7 @@ app.post('/api/analyze', async (req, res) => {
  * Handles follow-up questions about an already analyzed document.
  */
 app.post('/api/ask', async (req, res) => {
-  const { image, previousAnalysis = {}, question = '', model } = req.body;
+  const { image, previousAnalysis = {}, question = '', model, endpoint, context = '' } = req.body;
 
   if (!question || !question.trim()) {
     return res.status(400).json({
@@ -164,11 +165,16 @@ app.post('/api/ask', async (req, res) => {
   }
 
   try {
-    const prompt = buildFollowUpPrompt(previousAnalysis, question);
+    const analysisContext = (previousAnalysis && Object.keys(previousAnalysis).length > 0)
+      ? previousAnalysis
+      : { plainSummary: context || 'Previous analyzed document context.' };
+
+    const prompt = buildFollowUpPrompt(analysisContext, question);
     const result = await analyzeImageWithGemma4({
-      base64Image: image || previousAnalysis.image,
+      base64Image: image || previousAnalysis.image || '',
       prompt: prompt,
-      model: model || 'gemma4'
+      model: model || 'gemma4',
+      endpoint: endpoint
     });
 
     res.json({
