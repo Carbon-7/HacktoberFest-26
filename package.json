@@ -1,0 +1,27 @@
+{
+  "name": "gemmalens",
+  "version": "1.0.0",
+  "description": "Multimodal Visual Assistant for Everyone powered by Google Gemma 4 (7.5B) running locally via Ollama",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node test/test-ollama.js"
+  },
+  "keywords": [
+    "gemma4",
+    "ollama",
+    "multimodal",
+    "accessibility",
+    "hacktoberfest",
+    "open-source-ai",
+    "vision"
+  ],
+  "author": "Kavan",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

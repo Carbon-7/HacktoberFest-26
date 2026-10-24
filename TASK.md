@@ -18,13 +18,13 @@
 ---
 
 ### Phase 2: Backend Architecture & Ollama Integration
-- [ ] Initialize `package.json` with ESM configuration
-- [ ] Install minimal robust dependencies (`express`, `cors`)
-- [ ] Implement `server/ollamaClient.js` with vision payload formatting, timeout handling, and thinking extraction
-- [ ] Implement `server/prompts.js` with mode-specific system prompts (Medicine, Civic/Bills, Allergen Labels, General)
-- [ ] Implement `server/index.js` with `/api/health`, `/api/analyze`, and `/api/presets`
-- [ ] Test backend endpoints with synthetic and real image inputs
-- [ ] Git commit: `feat(backend): implement local Ollama Gemma 4 vision API with thinking extraction`
+- [x] Initialize `package.json` with ESM configuration
+- [x] Install minimal robust dependencies (`express`, `cors`)
+- [x] Implement `server/ollamaClient.js` with vision payload formatting, timeout handling, and thinking extraction
+- [x] Implement `server/prompts.js` with mode-specific system prompts (Medicine, Civic/Bills, Allergen Labels, General)
+- [x] Implement `server/index.js` with `/api/health`, `/api/analyze`, and `/api/presets`
+- [x] Test backend endpoints with synthetic and real image inputs
+- [x] Git commit: `feat(backend): implement local Ollama Gemma 4 vision API with thinking extraction`
 
 ---
 
