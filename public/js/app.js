@@ -133,6 +133,14 @@ class GemmaLensApp {
 
     // Audio Narration
     this.audioPlayBtn.addEventListener('click', () => this.toggleAudio());
+    const waveLines = this.soundwaveBox ? this.soundwaveBox.querySelectorAll('.wave-line') : [];
+    this.audio.onWaveUpdate = (levels) => {
+      if (!waveLines || waveLines.length === 0) return;
+      for (let i = 0; i < waveLines.length; i++) {
+        const h = levels[i] || 4;
+        waveLines[i].style.height = `${Math.round(h)}px`;
+      }
+    };
     this.audio.onStateChange = (isPlaying) => {
       if (isPlaying) {
         this.soundwaveBox.classList.add('active');
@@ -140,6 +148,9 @@ class GemmaLensApp {
       } else {
         this.soundwaveBox.classList.remove('active');
         this.audioPlayLabel.textContent = 'Listen';
+        if (waveLines) {
+          waveLines.forEach(line => line.style.height = '4px');
+        }
       }
     };
 

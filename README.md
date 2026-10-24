@@ -103,7 +103,7 @@ graph TD
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/Kavan/HacktoberFest-26.git
+git clone https://github.com/Carbon-7/HacktoberFest-26.git
 cd HacktoberFest-26
 ```
 
@@ -126,9 +126,16 @@ http://localhost:3000
 
 ---
 
-## 5. Chrome Extension Companion
+## 5. Chrome Extension Companion (Manifest V3)
 
-GemmaLens includes a companion browser extension in the [`extension/`](extension/) directory, allowing users to snapshot and explain any webpage (such as patient portals, complex billing invoices, or online ingredient lists):
+GemmaLens includes a companion browser extension in the [`extension/`](extension/) directory, empowering users to snapshot, select, and demystify any webpage (medical portals, utility dashboards, fine-print terms, or product labels) with continuous follow-up Q&A:
+
+### Key Companion Features
+* **Select Specific Zone (Area Snip):** Click **Select Specific Zone** to activate a precision crosshair overlay on your active tab. Drag a crop box over any paragraph, legal clause, billing row, or label to analyze just that section.
+* **Full Webpage Snapshot:** 1-click capture of the entire visible webpage.
+* **In-Extension Continuation Q&A:** Ask follow-up questions directly inside the extension popup (*"What is the penalty if I pay next week?"* or *"Can I take this with milk?"*).
+* **Local Scan History:** Revisit past webpage and zone scans with full summaries and continuation threads stored privately in browser storage.
+* **Dynamic Audio Narration:** Browser-native speech synthesis with synchronized visual soundwave bars.
 
 ### Installation (Two Methods)
 
@@ -142,7 +149,7 @@ GemmaLens includes a companion browser extension in the [`extension/`](extension
 1. In Chrome/Brave/Edge, navigate to `chrome://extensions/`.
 2. Enable **Developer mode** (top-right toggle).
 3. Click **Load unpacked** and select the [`extension/`](extension/) folder directly from this repository.
-4. While browsing any website, click the GemmaLens extension icon and select **Explain This Web Page** to run local Gemma 4 vision analysis on the visible tab.
+4. While browsing any website, click the GemmaLens icon to explain the full page or snip a specific area.
 
 ---
 
@@ -155,9 +162,11 @@ HacktoberFest-26/
 ├── package.json            # Project manifest and scripts
 ├── .gitignore              # Git exclusions for dependencies and internal trackers
 ├── extension/              # Chrome extension companion (Manifest V3)
-│   ├── manifest.json       # Extension manifest
-│   ├── popup.html          # Extension popup interface
-│   ├── popup.js            # Tab capture & local bridge logic
+│   ├── manifest.json       # Extension manifest (activeTab, scripting, storage)
+│   ├── background.js       # Background service worker coordinating tab captures
+│   ├── crop.js             # In-page crosshair area selection and floating HUD
+│   ├── popup.html          # macOS frosted glass popup interface
+│   ├── popup.js            # Capture, zone crop, continuation Q&A, and history controller
 │   └── icon.png            # Extension icon
 ├── src/
 │   └── server/
@@ -171,9 +180,10 @@ HacktoberFest-26/
 │   │   └── style.css       # Clean neutral stylesheet with frosted glass styling
 │   ├── js/
 │   │   ├── app.js          # Client controller, ingestion, and results renderer
-│   │   └── audio.js        # Web Speech API audio narration engine
+│   │   └── audio.js        # Audio engine with boundary-driven speech soundwaves
 │   └── assets/
-│       └── presets/        # High-resolution sample document images
+│       ├── presets/        # High-resolution sample document images
+│       └── gemmalens-extension.zip # Packaged Chrome extension for 1-click download
 └── docs/
     └── screenshots/        # Application interface captures
 ```
@@ -184,6 +194,8 @@ HacktoberFest-26/
 
 * **macOS-Inspired Glassmorphism:** Clean, neutral palette with frosted glass cards (`rgba(255, 255, 255, 0.78)` with `backdrop-filter: blur(24px)`), soft shadows, and clean buttons.
 * **Zero Visual Clutter:** No emojis or AI jargon. Employs crisp monochrome SVG stroke icons and legible typography.
+* **Audio-Reactive Soundwave:** Dynamic visual equalizer heights driven by real Web Speech API boundary events, pulsing with speech cadence and resting cleanly at baseline during pauses.
+* **Unified Theme Palette:** Pure Apple System Blue (`#0071E3`) and neutral slate tokens across loading indicators, progress tracks, and interactive badges.
 * **Adjustable Typography:** Dynamic text scaling controls (`A-` and `A+`) allow instant resizing of the interface for low-vision and elderly users.
 * **Interactive Checklist:** Action items feature clickable checkboxes to support cognitive clarity and task tracking.
 * **Scan History & New Scan Reset:** Easily revisit previous scans via the history drawer or start fresh with a single click.
@@ -192,7 +204,7 @@ HacktoberFest-26/
 
 ## 8. Authors & Credits
 
-* **Kavan** — Project Author & Maintainer &bull; [GitHub Profile](https://github.com/Kavan)
+* **Maintainer & Author:** [HacktoberFest-26 Team](https://github.com/Carbon-7/HacktoberFest-26)
 * **Event:** Hacktoberfest Hack Day 2026 (Major League Hacking)
 * **Model:** Google Gemma 4 (Google DeepMind)
 * **Local Inference:** Ollama Project
@@ -203,3 +215,4 @@ HacktoberFest-26/
 ## 9. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
