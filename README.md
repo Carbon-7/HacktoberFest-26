@@ -4,9 +4,12 @@
 [![Hackathon](https://img.shields.io/badge/Hacktoberfest-Hack%20Day%202026-blue.svg)](https://hacktoberfest.com/)
 [![Model](https://img.shields.io/badge/Model-Google%20Gemma%204%20(7.5B)-black.svg)](https://ai.google.dev/gemma)
 [![Inference](https://img.shields.io/badge/Inference-Local%20Ollama-green.svg)](https://ollama.com/)
-[![Extension](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blueviolet.svg)](#7-chrome-extension-companion)
+[![Extension](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blueviolet.svg)](#5-chrome-side-panel-companion-manifest-v3)
+[![Pitch Deck](https://img.shields.io/badge/Presentation-Google%20Slides-orange.svg)](https://docs.google.com/presentation/d/1Mt1UiR-sh9u9TT2e1bRYvcftdptioTkH/edit?usp=sharing&ouid=112926542322231776264&rtpof=true&sd=true)
 
 An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens automatically detects and demystifies physical documents, predatory HR employment contracts, medical prescriptions, utility bills, cloud system traces, and physics derivations into clear everyday language with interactive Mermaid.js visual flowcharts, one-click voice narration, follow-up Q&A, and persistent scan history.
+
+> 📽️ **Official Presentation Deck:** [View Hackathon Pitch Deck on Google Slides](https://docs.google.com/presentation/d/1Mt1UiR-sh9u9TT2e1bRYvcftdptioTkH/edit?usp=sharing&ouid=112926542322231776264&rtpof=true&sd=true)
 
 ---
 
