@@ -29,13 +29,13 @@
 ---
 
 ### Phase 3: Accessible Frontend Client UI
-- [ ] Build `public/index.html` with semantic accessible structure (ARIA, high contrast)
-- [ ] Build `public/css/style.css` following `DESIGN.md` tokens, gradients, and micro-animations
-- [ ] Build `public/js/audio.js` (Web Speech API integration for natural TTS read-aloud)
-- [ ] Build `public/js/app.js` (Image upload/camera capture, preset loader, mode toggling, state handling)
-- [ ] Add preloaded test image assets in `public/assets/presets/` (Prescription, Utility Bill, Food Label)
-- [ ] Implement Gemma 4 Thinking Process accordion component with syntax styling
-- [ ] Git commit: `feat(frontend): create accessible multimodal UI with voice narration and thinking accordion`
+- [x] Build `public/index.html` with semantic accessible structure (ARIA, high contrast)
+- [x] Build `public/css/style.css` following `DESIGN.md` tokens, gradients, and micro-animations
+- [x] Build `public/js/audio.js` (Web Speech API integration for natural TTS read-aloud)
+- [x] Build `public/js/app.js` (Image upload/camera capture, preset loader, mode toggling, state handling)
+- [x] Add preloaded test image assets in `public/assets/presets/` (Prescription, Utility Bill, Food Label)
+- [x] Implement Gemma 4 Thinking Process accordion component with syntax styling
+- [x] Git commit: `feat(frontend): create accessible multimodal UI with voice narration and thinking accordion`
 
 ---
 
