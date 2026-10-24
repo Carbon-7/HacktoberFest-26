@@ -79,9 +79,28 @@ class GemmaLensApp {
     this.audioPlayLabel = document.getElementById('audioPlayLabel');
     this.soundwaveBox = document.getElementById('soundwaveBox');
 
-    // Extension Modal
+    // Extension & Side Panel Modal
+    this.extensionBtn = document.getElementById('extensionBtn');
     this.extensionModalBackdrop = document.getElementById('extensionModalBackdrop');
     this.closeExtensionModalBtn = document.getElementById('closeExtensionModalBtn');
+
+    // Settings Modal Elements
+    this.settingsBtn = document.getElementById('settingsBtn');
+    this.settingsModalBackdrop = document.getElementById('settingsModalBackdrop');
+    this.closeSettingsModalBtn = document.getElementById('closeSettingsModalBtn');
+    this.saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    this.textScaleSlider = document.getElementById('textScaleSlider');
+    this.textScaleValue = document.getElementById('textScaleValue');
+    this.settingsVoiceSelect = document.getElementById('settingsVoiceSelect');
+    this.speechSpeedSlider = document.getElementById('speechSpeedSlider');
+    this.speechPitchSlider = document.getElementById('speechPitchSlider');
+    this.speechSpeedValue = document.getElementById('speechSpeedValue');
+    this.speechPitchValue = document.getElementById('speechPitchValue');
+    this.testVoiceBtn = document.getElementById('testVoiceBtn');
+    this.regionalSelect = document.getElementById('regionalSelect');
+
+    // Multi-Domain State
+    this.currentDomain = 'auto';
 
     // History Drawer
     this.historyDrawer = document.getElementById('historyDrawer');
@@ -95,6 +114,10 @@ class GemmaLensApp {
     this.cameraVideo = document.getElementById('cameraVideo');
     this.captureSnapshotBtn = document.getElementById('captureSnapshotBtn');
     this.closeCameraBtn = document.getElementById('closeCameraBtn');
+
+    // Initialize user settings from storage
+    this.initUserSettings();
+    this.checkUrlSessionSync();
   }
 
   bindEvents() {
@@ -105,7 +128,17 @@ class GemmaLensApp {
     });
     this.newScanBtn.addEventListener('click', () => this.resetToNewScan());
 
-    // File Drag & Drop
+    // Domain Selector Pills
+    const domainPills = document.querySelectorAll('.domain-pill');
+    domainPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        domainPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        this.currentDomain = pill.getAttribute('data-domain') || 'auto';
+      });
+    });
+
+    // File Drag & Drop (supports PDF and images)
     this.dropzoneCard.addEventListener('dragover', (e) => {
       e.preventDefault();
       this.dropzoneCard.classList.add('dragover');
@@ -119,11 +152,11 @@ class GemmaLensApp {
       e.preventDefault();
       this.dropzoneCard.classList.remove('dragover');
       const files = e.dataTransfer.files;
-      if (files.length > 0) this.handleImageFile(files[0]);
+      if (files.length > 0) this.handleUploadedFile(files[0]);
     });
 
     this.fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) this.handleImageFile(e.target.files[0]);
+      if (e.target.files.length > 0) this.handleUploadedFile(e.target.files[0]);
     });
 
     // Camera Handlers
@@ -154,12 +187,28 @@ class GemmaLensApp {
       }
     };
 
-    // Extension Modal
+    // Extension / Side Panel Modal
     this.extensionBtn.addEventListener('click', () => this.toggleExtensionModal(true));
     this.closeExtensionModalBtn.addEventListener('click', () => this.toggleExtensionModal(false));
     this.extensionModalBackdrop.addEventListener('click', (e) => {
       if (e.target === this.extensionModalBackdrop) this.toggleExtensionModal(false);
     });
+
+    // Settings Modal
+    if (this.settingsBtn) {
+      this.settingsBtn.addEventListener('click', () => this.toggleSettingsModal(true));
+    }
+    if (this.closeSettingsModalBtn) {
+      this.closeSettingsModalBtn.addEventListener('click', () => this.toggleSettingsModal(false));
+    }
+    if (this.saveSettingsBtn) {
+      this.saveSettingsBtn.addEventListener('click', () => this.toggleSettingsModal(false));
+    }
+    if (this.settingsModalBackdrop) {
+      this.settingsModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.settingsModalBackdrop) this.toggleSettingsModal(false);
+      });
+    }
 
     // Follow-up Q&A Submission
     this.qnaForm.addEventListener('submit', (e) => {
@@ -173,11 +222,9 @@ class GemmaLensApp {
     this.drawerBackdrop.addEventListener('click', () => this.toggleHistoryDrawer(false));
     this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
 
-    // Font Scaling Controls
-    this.fontIncBtn.addEventListener('click', () => {
-      this.fontScale = Math.min(1.3, this.fontScale + 0.08);
-      document.documentElement.style.setProperty('--user-scale', `${this.fontScale}rem`);
-    });
+    // Font Scaling Controls (Quick +/-)
+    this.fontIncBtn.addEventListener('click', () => this.adjustScale(5));
+    this.fontDecBtn.addEventListener('click', () => this.adjustScale(-5));
 
     this.fontDecBtn.addEventListener('click', () => {
       this.fontScale = Math.max(0.85, this.fontScale - 0.08);
@@ -263,9 +310,14 @@ class GemmaLensApp {
     });
   }
 
-  handleImageFile(file) {
+  async handleUploadedFile(file) {
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      await this.handlePdfFile(file);
+      return;
+    }
+
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (PNG, JPEG, or WEBP).');
+      alert('Please upload an image (PNG, JPEG, WEBP) or PDF document.');
       return;
     }
 
@@ -277,6 +329,169 @@ class GemmaLensApp {
       });
     };
     reader.readAsDataURL(file);
+  }
+
+  async handlePdfFile(file) {
+    try {
+      if (!window.pdfjsLib) {
+        throw new Error('PDF processing engine is still initializing. Please try again.');
+      }
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      // Render Page 1 at high DPI for crystal clear vision analysis
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 2.0 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      this.currentImageBase64 = canvas.toDataURL('image/png');
+      this.startAnalysis();
+    } catch (err) {
+      console.error('PDF ingestion error:', err);
+      alert('Failed to process PDF: ' + err.message);
+    }
+  }
+
+  initUserSettings() {
+    // Theme setup
+    const savedTheme = localStorage.getItem('gemmalens_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeBtns = document.querySelectorAll('.theme-option-btn');
+    themeBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-theme') === savedTheme);
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('gemmalens_theme', theme);
+        themeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Text Scale
+    this.currentScale = parseInt(localStorage.getItem('gemmalens_scale') || '100', 10);
+    this.applyScale(this.currentScale);
+
+    if (this.textScaleSlider) {
+      this.textScaleSlider.value = this.currentScale;
+      this.textScaleSlider.addEventListener('input', (e) => {
+        this.applyScale(parseInt(e.target.value, 10));
+      });
+    }
+
+    const scalePills = document.querySelectorAll('.scale-pill-btn');
+    scalePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const val = parseInt(pill.getAttribute('data-scale'), 10);
+        this.applyScale(val);
+      });
+    });
+
+    // Voices
+    const populateVoices = () => {
+      if (!this.settingsVoiceSelect || !this.audio || !this.audio.synth) return;
+      const voices = this.audio.synth.getVoices();
+      if (voices.length === 0) return;
+      this.settingsVoiceSelect.innerHTML = '<option value="">System Default Voice</option>';
+      voices.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `${v.name} (${v.lang})`;
+        this.settingsVoiceSelect.appendChild(opt);
+      });
+    };
+    populateVoices();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    if (this.settingsVoiceSelect) {
+      this.settingsVoiceSelect.addEventListener('change', (e) => {
+        const idx = e.target.value;
+        if (idx !== '' && this.audio && this.audio.synth) {
+          const voices = this.audio.synth.getVoices();
+          if (voices[idx]) this.audio.voice = voices[idx];
+        }
+      });
+    }
+
+    if (this.speechSpeedSlider) {
+      this.speechSpeedSlider.addEventListener('input', (e) => {
+        const spd = parseFloat(e.target.value);
+        if (this.speechSpeedValue) this.speechSpeedValue.textContent = spd.toFixed(2) + 'x';
+        this.audio.setRate(spd);
+      });
+    }
+
+    if (this.speechPitchSlider) {
+      this.speechPitchSlider.addEventListener('input', (e) => {
+        const pitch = parseFloat(e.target.value);
+        if (this.speechPitchValue) this.speechPitchValue.textContent = pitch.toFixed(1);
+        this.audio.pitch = pitch;
+      });
+    }
+
+    if (this.testVoiceBtn) {
+      this.testVoiceBtn.addEventListener('click', () => {
+        this.audio.speak('GemmaLens voice narration is fully configured and ready.');
+      });
+    }
+
+    // Regional
+    if (this.regionalSelect) {
+      const savedRegion = localStorage.getItem('gemmalens_region') || 'US';
+      this.regionalSelect.value = savedRegion;
+      this.regionalSelect.addEventListener('change', (e) => {
+        localStorage.setItem('gemmalens_region', e.target.value);
+      });
+    }
+  }
+
+  applyScale(val) {
+    this.currentScale = Math.min(140, Math.max(80, val));
+    document.documentElement.style.fontSize = `${(this.currentScale / 100) * 16}px`;
+    localStorage.setItem('gemmalens_scale', this.currentScale);
+    if (this.textScaleValue) this.textScaleValue.textContent = `${this.currentScale}%`;
+    if (this.textScaleSlider) this.textScaleSlider.value = this.currentScale;
+    document.querySelectorAll('.scale-pill-btn').forEach(pill => {
+      pill.classList.toggle('active', parseInt(pill.getAttribute('data-scale'), 10) === this.currentScale);
+    });
+  }
+
+  adjustScale(delta) {
+    this.applyScale((this.currentScale || 100) + delta);
+  }
+
+  toggleSettingsModal(show) {
+    if (this.settingsModalBackdrop) {
+      this.settingsModalBackdrop.classList.toggle('active', show);
+    }
+  }
+
+  async checkUrlSessionSync() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const syncSessionId = urlParams.get('session');
+    if (!syncSessionId) return;
+
+    try {
+      const res = await fetch(`/api/sync-session/${syncSessionId}`);
+      const json = await res.json();
+      if (json.success && json.session) {
+        this.currentImageBase64 = json.session.image;
+        this.currentAnalysisResult = json.session.data;
+        this.renderAnalysisResults(json.session.data, json.session.thinking, json.session.metrics);
+        this.saveToHistory(json.session.data);
+      }
+    } catch (err) {
+      console.warn('Could not load synced session:', err);
+    }
   }
 
   compressImage(dataUrl, maxDimension, callback) {
@@ -404,7 +619,8 @@ class GemmaLensApp {
     this.startLoadingAnimation();
 
     const payload = {
-      image: this.currentImageBase64
+      image: this.currentImageBase64,
+      domainPreference: this.currentDomain || 'auto'
     };
 
     try {
@@ -421,6 +637,23 @@ class GemmaLensApp {
 
       this.currentAnalysisResult = result;
       this.saveToHistory(result, this.currentImageBase64);
+
+      // Sync session to server for cross-device/extension continuity
+      fetch('/api/sync-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session: {
+            id: 'sync_' + Date.now(),
+            data: result.data,
+            category: result.category,
+            image: this.currentImageBase64,
+            thinking: result.thinking,
+            metrics: result.metrics
+          }
+        })
+      }).catch(console.warn);
+
       this.displayResults(result);
     } catch (err) {
       alert('Analysis Error: ' + err.message + '\n\nPlease ensure Ollama daemon is running with Gemma 4 on localhost:11434.');

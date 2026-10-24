@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "GemmaLens — Universal Visual Assistant",
-  "version": "1.1.0",
-  "description": "Chrome companion for GemmaLens. Snapshots web pages, specific page zones, medical portals, and fine print, explaining them in plain language with follow-up Q&A.",
+  "version": "1.2.0",
+  "description": "Chrome Side Panel companion for GemmaLens. Snapshots webpages, crops specific zones with a resizable snipping tool, and syncs seamlessly with GemmaLens.",
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "host_permissions": [
     "http://localhost:3000/*"
@@ -14,9 +15,11 @@
   "background": {
     "service_worker": "background.js"
   },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "action": {
-    "default_popup": "popup.html",
-    "default_title": "GemmaLens Visual Assistant"
+    "default_title": "Open GemmaLens Side Panel"
   },
   "icons": {
     "16": "icon.png",

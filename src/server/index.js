@@ -67,12 +67,51 @@ app.get('/api/download-extension', (req, res) => {
   res.download(zipPath, 'gemmalens-extension.zip');
 });
 
+// In-memory sync store for cross-device/extension session continuity
+const syncedSessions = new Map();
+
+/**
+ * POST /api/sync-session
+ * Stores an analyzed document session from extension or web app for 1-click continuation.
+ */
+app.post('/api/sync-session', (req, res) => {
+  const { session } = req.body;
+  if (!session || !session.id) {
+    return res.status(400).json({ success: false, error: 'Invalid session payload' });
+  }
+
+  syncedSessions.set(session.id, {
+    ...session,
+    syncedAt: new Date().toISOString()
+  });
+
+  // Limit memory buffer to 60 recent sessions
+  if (syncedSessions.size > 60) {
+    const oldestKey = syncedSessions.keys().next().value;
+    syncedSessions.delete(oldestKey);
+  }
+
+  res.json({ success: true, sessionId: session.id });
+});
+
+/**
+ * GET /api/sync-session/:id
+ * Retrieves a synced session by ID.
+ */
+app.get('/api/sync-session/:id', (req, res) => {
+  const session = syncedSessions.get(req.params.id);
+  if (!session) {
+    return res.status(404).json({ success: false, error: 'Session not found or expired' });
+  }
+  res.json({ success: true, session });
+});
+
 /**
  * POST /api/analyze
- * Analyzes an uploaded image or preset with Gemma 4 using intelligent auto-detection.
+ * Analyzes an uploaded image, PDF snapshot, or preset with Gemma 4 using multi-domain auto-detection.
  */
 app.post('/api/analyze', async (req, res) => {
-  const { image, query = '', model } = req.body;
+  const { image, query = '', domainPreference = '', model } = req.body;
 
   if (!image) {
     return res.status(400).json({
@@ -82,14 +121,14 @@ app.post('/api/analyze', async (req, res) => {
   }
 
   try {
-    const prompt = buildPrompt(query);
+    const prompt = buildPrompt(query, [], domainPreference);
     const result = await analyzeImageWithGemma4({
       base64Image: image,
       prompt: prompt,
       model: model || 'gemma4'
     });
 
-    const category = result.data.category || 'General Visual';
+    const category = result.data.category || 'General Visual Document';
 
     res.json({
       success: true,

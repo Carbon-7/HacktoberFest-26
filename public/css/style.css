@@ -1384,3 +1384,365 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================================================================
+   Domain Selector Pills & Ingestion Enhancements
+   =================================================================== */
+.domain-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.domain-pill {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  backdrop-filter: blur(8px);
+}
+
+.domain-pill:hover {
+  background: white;
+  color: var(--text-primary);
+  border-color: rgba(0, 113, 227, 0.3);
+  transform: translateY(-1px);
+}
+
+.domain-pill.active {
+  background: #1D1D1F;
+  color: white;
+  border-color: #1D1D1F;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dropzone-format-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--accent-blue);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+}
+
+/* ===================================================================
+   Settings & Accessibility Modal
+   =================================================================== */
+.settings-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.settings-modal-backdrop.active {
+  display: flex;
+}
+
+.settings-modal-card {
+  background: var(--glass-surface-elevated);
+  backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  animation: enterScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.settings-modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-blue-subtle);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.settings-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+.settings-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.settings-group {
+  margin-bottom: 1.4rem;
+}
+
+.settings-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.settings-value-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background: var(--accent-blue-subtle);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+/* Theme Switcher Grid */
+.theme-options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.theme-option-btn {
+  background: var(--glass-surface);
+  border: 1.5px solid var(--glass-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-option-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+.theme-option-btn.active {
+  border-color: var(--accent-blue);
+  background: rgba(0, 113, 227, 0.05);
+  color: var(--accent-blue);
+}
+
+.theme-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.swatch-light { background: #FFFFFF; }
+.swatch-dark { background: #16181F; border-color: rgba(255, 255, 255, 0.2); }
+.swatch-contrast { background: #000000; border: 2px solid #FFFFFF; }
+.swatch-warm { background: #FAF6EE; border-color: #D6CBB8; }
+
+/* Settings Inputs */
+.settings-slider {
+  width: 100%;
+  accent-color: var(--accent-blue);
+  height: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.scale-presets-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.scale-pill-btn {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.scale-pill-btn:hover {
+  background: white;
+  color: var(--text-primary);
+}
+
+.scale-pill-btn.active {
+  background: var(--text-primary);
+  color: white;
+  border-color: var(--text-primary);
+}
+
+.settings-select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border-subtle);
+  background: var(--glass-surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.settings-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.telemetry-box {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+}
+
+.telemetry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.telemetry-row:last-child {
+  border-bottom: none;
+}
+
+.telemetry-badge-green {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--status-green-bg);
+  color: #15803D;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.settings-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--glass-border-subtle);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ===================================================================
+   Theme Overrides
+   =================================================================== */
+[data-theme="dark"] {
+  --bg-canvas: #0D0E12;
+  --bg-canvas-subtle: #16181F;
+  --glass-surface: rgba(22, 24, 31, 0.85);
+  --glass-surface-elevated: rgba(28, 30, 39, 0.95);
+  --glass-surface-subtle: rgba(22, 24, 31, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-subtle: rgba(255, 255, 255, 0.06);
+  --text-primary: #F5F5F7;
+  --text-secondary: #9E9EA7;
+  --text-tertiary: #6E6E78;
+  --accent-neutral: #E5E5EA;
+  --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .app-header {
+  background: rgba(13, 14, 18, 0.85);
+}
+
+[data-theme="dark"] .domain-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #9E9EA7;
+}
+
+[data-theme="dark"] .domain-pill.active {
+  background: #0071E3;
+  color: white;
+  border-color: #0071E3;
+}
+
+[data-theme="high-contrast"] {
+  --bg-canvas: #000000;
+  --bg-canvas-subtle: #121212;
+  --glass-surface: #121212;
+  --glass-surface-elevated: #1E1E1E;
+  --glass-border: #FFFFFF;
+  --glass-border-subtle: #888888;
+  --text-primary: #FFFFFF;
+  --text-secondary: #E5E5E5;
+  --text-tertiary: #CCCCCC;
+  --accent-blue: #2997FF;
+}
+
+[data-theme="warm"] {
+  --bg-canvas: #FAF6EE;
+  --bg-canvas-subtle: #F2ECE0;
+  --glass-surface: rgba(255, 253, 248, 0.9);
+  --glass-surface-elevated: #FFFDF8;
+  --glass-border: rgba(180, 160, 130, 0.25);
+  --glass-border-subtle: rgba(180, 160, 130, 0.15);
+  --text-primary: #2C2825;
+  --text-secondary: #6B625B;
+  --text-tertiary: #8C827A;
+  --accent-blue: #C25E00;
+  --accent-blue-hover: #D46900;
+}
+

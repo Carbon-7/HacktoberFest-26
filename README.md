@@ -20,22 +20,35 @@ An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B
 
 ## 1. What Does It Do, and For Whom?
 
-Dense paperwork and intimidating packaging create everyday barriers for millions:
+Dense paperwork, confusing packaging, and intimidating technical diagrams create everyday barriers for millions:
 * **Patients and elderly citizens** struggle with small print on medicine containers, confusing dosing schedules, and unnoticed allergy contraindications.
 * **Ordinary citizens and tenants** face high stress deciphering utility bills, disconnect notices, and administrative penalties.
 * **Consumers and families** need immediate clarity on allergen warnings, cross-contamination statements, and hidden dietary risks.
+* **Developers, students, and travelers** need instant, grounded visual explanations for architecture schematics, foreign transit maps, math proofs, and balance sheets.
 
-**GemmaLens** eliminates manual mode selection. A user simply takes a photo, uploads an image, or clicks a preloaded sample document. The system **automatically classifies the document**, translates it into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
+**GemmaLens** eliminates manual mode selection. A user simply drops a PDF document, image, or snapshot. The system **automatically classifies the domain**, translates it into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
 
-### Core Features
-* **Intelligent Auto-Detection:** Automatically identifies whether an image is a prescription, utility bill, food allergen label, or general document.
-* **Plain Language Summaries:** 5th-grade reading level explanations without clinical or bureaucratic jargon.
-* **Interactive Action Checklist:** Clickable checkboxes to help users step through tasks (e.g. dosing schedule, bill payment, allergen checks).
-* **Follow-Up Doubts & Q&A:** An interactive conversation module allowing users to ask further questions about the document (such as *"Can I take this with milk?"* or *"What happens if I miss the due date?"*).
-* **Scan History Drawer:** Stores previous analyses in browser local storage for instant revisitation.
-* **Verified Free Authoritative Links:** Curates direct reference links to official resources (such as MedlinePlus, FDA, and Benefits.gov) for verified information.
-* **Voice-First Narration (TTS):** Browser-native speech synthesis reads explanations aloud for elderly or visually impaired users.
-* **Clean Single-Screen Flow:** The dropzone and hero automatically hide during analysis, and a prominent **New Scan** button allows returning to the upload state at any time.
+### The X-Factor: Why GemmaLens Surpasses Generic Chat Apps
+Why use GemmaLens instead of pasting into a generic cloud chatbot?
+
+| Feature | Generic Cloud Chat Apps (ChatGPT / Claude) | GemmaLens Universal Visual Assistant |
+| :--- | :--- | :--- |
+| **Data Privacy & Compliance** | Cloud data leakage; exposes confidential prescriptions, bank accounts, and tax forms to external servers. | **100% Local Inference:** Powered by Google Gemma 4 on local Ollama (`localhost:11434`). Zero cloud dependencies; sensitive documents never leave your device. |
+| **User Experience & Output** | Wall of text; requires typing prompts and manual reading. | **Action-Oriented Cognitive Layout:** Automatic classification, interactive checklist with checkboxes, severe warning banners, and key metric cards. |
+| **Browser Integration** | Requires switching tabs, saving screenshots, and uploading files. | **Native Chrome Side Panel Companion:** Docks right next to your active tab with a **Resizable Snipping Tool** to crop any specific paragraph, chart, or bill line with live sync to the main app. |
+| **Accessibility & Narration** | Static robotic voice or none. | **Speech-Reactive Soundwave:** Web Speech API boundary-driven audio equalizer with live rhythm tracking, custom voice picker, and speed/pitch tuning. |
+| **Document Support** | Limited image uploads. | **High-DPI PDF & Multi-Format:** Native in-browser PDF rendering via PDF.js for crisp character recognition on multipage documents. |
+| **Civic & Regional Grounding** | Generic hallucinated advice. | **Contextual Civic Routing:** Recommends verified local support bodies (e.g. LIHEAP energy assistance, NHS advice, CFPB consumer complaints, MedlinePlus). |
+
+### Multi-Domain Intelligence Roles
+GemmaLens dynamically adapts its cognitive role based on the visual input:
+1. **Prescription & Medicine:** Extracts dosing, timing, severe contraindications, and food instructions.
+2. **Financial, Utility & Legal Simplifier:** Dissects complex contracts, eviction warnings, and payment penalties, linking to regional aid bodies.
+3. **Developer & System Architecture Tutor:** Explains error stack traces, database ERDs, terminal logs, and system schematics.
+4. **Academic & Intuitive Tutor:** Transforms complex math formulas, physics diagrams, and textbook pages into step-by-step intuitive analogies.
+5. **Trip Planner & Local Transit Guide:** Translates foreign subway maps, street signs, and restaurant menus with dietary warnings.
+6. **Stocks & Markets Interpreter:** Summarizes quarterly earnings slides, balance sheets, candlestick patterns, and financial risk disclosures.
+7. **Food & Allergen Safety Lens:** Flags allergen cross-contamination and nutritional highlights.
 
 ---
 
@@ -126,30 +139,24 @@ http://localhost:3000
 
 ---
 
-## 5. Chrome Extension Companion (Manifest V3)
+## 5. Chrome Side Panel Companion (Manifest V3)
 
-GemmaLens includes a companion browser extension in the [`extension/`](extension/) directory, empowering users to snapshot, select, and demystify any webpage (medical portals, utility dashboards, fine-print terms, or product labels) with continuous follow-up Q&A:
+GemmaLens includes a companion browser extension in [`extension/`](extension/) built on the modern Chrome **Side Panel API**. It docks directly alongside your active webpage, providing instant visual intelligence, resizable snipping, and seamless two-way session synchronization with the GemmaLens desktop app:
 
-### Key Companion Features
-* **Select Specific Zone (Area Snip):** Click **Select Specific Zone** to activate a precision crosshair overlay on your active tab. Drag a crop box over any paragraph, legal clause, billing row, or label to analyze just that section.
-* **Full Webpage Snapshot:** 1-click capture of the entire visible webpage.
-* **In-Extension Continuation Q&A:** Ask follow-up questions directly inside the extension popup (*"What is the penalty if I pay next week?"* or *"Can I take this with milk?"*).
-* **Local Scan History:** Revisit past webpage and zone scans with full summaries and continuation threads stored privately in browser storage.
-* **Dynamic Audio Narration:** Browser-native speech synthesis with synchronized visual soundwave bars.
+### Key Companion Capabilities
+* **Native Chrome Side Panel:** Opens as a persistent sidebar right next to your active webpage without blocking content.
+* **Interactive Resizable Snipping Tool (`crop.js`):** Click **Resizable Snipping Tool** to activate an on-page snipping interface with 8 resize handles. Drag, reposition, and resize the selection box around any paragraph, fine-print clause, terminal error, or chart, then click **Analyze Selected Zone**.
+* **1-Click Open & Sync in GemmaLens App:** Click **Open & Sync in App** inside the side panel to securely transfer the active document, extracted details, and checklist directly into the full-screen desktop interface via the `/api/sync-session` bridge.
+* **In-Panel Continuation Q&A:** Ask questions in real-time about the page or snipped section (*"Does this clause allow early cancellation?"* or *"What is the syntax error on line 42?"*).
+* **Local Scan History:** Privately stores past page and zone scans with one-click restore in browser local storage.
+* **Side-by-Side Audio Narration:** Listens to plain explanations while reading along with dynamic soundwave feedback.
 
-### Installation (Two Methods)
-
-#### Option A: 1-Click In-App Download
-1. In the GemmaLens web app header at `http://localhost:3000`, click the **Extension** button.
-2. Click **Download Extension (.ZIP)** to get `gemmalens-extension.zip`.
-3. Extract the zip to any folder.
-4. In Chrome/Brave/Edge, navigate to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the extracted folder.
-
-#### Option B: Load Directly from Repository
-1. In Chrome/Brave/Edge, navigate to `chrome://extensions/`.
-2. Enable **Developer mode** (top-right toggle).
-3. Click **Load unpacked** and select the [`extension/`](extension/) folder directly from this repository.
-4. While browsing any website, click the GemmaLens icon to explain the full page or snip a specific area.
+### Installation Instructions
+1. In the GemmaLens web app header at `http://localhost:3000`, click the **Side Panel** button.
+2. Click **Download Extension (.ZIP)** to download `gemmalens-extension.zip`.
+3. Extract the ZIP archive to any local directory (or use the [`extension/`](extension/) directory directly from this repository).
+4. In Chrome/Brave/Edge, navigate to `chrome://extensions`, enable **Developer mode** (top-right toggle), click **Load unpacked**, and select the extracted folder.
+5. Click the GemmaLens icon in your browser toolbar to dock the Side Panel beside any webpage.
 
 ---
 
@@ -158,29 +165,32 @@ GemmaLens includes a companion browser extension in the [`extension/`](extension
 ```
 HacktoberFest-26/
 ├── LICENSE                 # MIT Open-Source License
-├── README.md               # Comprehensive project documentation
+├── README.md               # Comprehensive project documentation & benchmarks
 ├── package.json            # Project manifest and scripts
 ├── .gitignore              # Git exclusions for dependencies and internal trackers
-├── extension/              # Chrome extension companion (Manifest V3)
-│   ├── manifest.json       # Extension manifest (activeTab, scripting, storage)
-│   ├── background.js       # Background service worker coordinating tab captures
-│   ├── crop.js             # In-page crosshair area selection and floating HUD
-│   ├── popup.html          # macOS frosted glass popup interface
-│   ├── popup.js            # Capture, zone crop, continuation Q&A, and history controller
-│   └── icon.png            # Extension icon
+├── extension/              # Chrome Side Panel companion (Manifest V3)
+│   ├── manifest.json       # SidePanel, activeTab, scripting, and storage permissions
+│   ├── background.js       # Background service worker coordinating sidepanel & snipping
+│   ├── sidepanel.html      # macOS frosted glass side panel markup
+│   ├── sidepanel.js        # Side panel controller, analysis engine & app sync
+│   ├── crop.js             # 8-handle resizable snipping tool & in-page floating HUD
+│   ├── popup.html          # Fallback extension popup
+│   ├── popup.js            # Popup controller
+│   └── icon.png            # High-resolution extension icon
 ├── src/
 │   └── server/
-│       ├── index.js        # Express application server and static hosting
-│       ├── ollamaClient.js # Local Ollama HTTP bridge and schema parser
-│       ├── prompts.js      # Structured system prompts and mode definitions
+│       ├── index.js        # Express server, static hosting & /api/sync-session bridge
+│       ├── ollamaClient.js # Local Ollama HTTP bridge, streaming & schema parser
+│       ├── prompts.js      # Multi-domain prompts (health, legal, code, tutor, stocks)
 │       └── presetsData.js  # Sample document metadata and image loaders
 ├── public/
 │   ├── index.html          # Semantic, accessible macOS glassmorphism interface
+│   ├── favicon.svg         # Modern Apple-style lens favicon
 │   ├── css/
-│   │   └── style.css       # Clean neutral stylesheet with frosted glass styling
+│   │   └── style.css       # Clean stylesheet with themes (Light, OLED, High-Contrast, Warm)
 │   ├── js/
-│   │   ├── app.js          # Client controller, ingestion, and results renderer
-│   │   └── audio.js        # Audio engine with boundary-driven speech soundwaves
+│   │   ├── app.js          # App controller, PDF.js renderer, settings & sync engine
+│   │   └── audio.js        # Boundary-driven speech engine with live soundwave physics
 │   └── assets/
 │       ├── presets/        # High-resolution sample document images
 │       └── gemmalens-extension.zip # Packaged Chrome extension for 1-click download
