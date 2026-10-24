@@ -4,14 +4,15 @@
 [![Hackathon](https://img.shields.io/badge/Hacktoberfest-Hack%20Day%202026-blue.svg)](https://hacktoberfest.com/)
 [![Model](https://img.shields.io/badge/Model-Google%20Gemma%204%20(7.5B)-black.svg)](https://ai.google.dev/gemma)
 [![Inference](https://img.shields.io/badge/Inference-Local%20Ollama-green.svg)](https://ollama.com/)
+[![Extension](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blueviolet.svg)](#7-chrome-extension-companion)
 
-An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens demystifies physical documents, medicine labels, utility bills, and food packaging into clear everyday language with one-click voice narration.
+An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens automatically detects and demystifies physical documents, medicine labels, utility bills, and food packaging into clear everyday language with one-click voice narration, follow-up Q&A, and persistent scan history.
 
 ---
 
 ## Interface Overview
 
-| Home & Sample Gallery | Analysis & Action Checklist |
+| Home & Sample Gallery | Auto-Detected Analysis & Checklist |
 | :---: | :---: |
 | ![Home Interface](docs/screenshots/home.png) | ![Analysis Results](docs/screenshots/results.png) |
 
@@ -24,13 +25,17 @@ Dense paperwork and intimidating packaging create everyday barriers for millions
 * **Ordinary citizens and tenants** face high stress deciphering utility bills, disconnect notices, and administrative penalties.
 * **Consumers and families** need immediate clarity on allergen warnings, cross-contamination statements, and hidden dietary risks.
 
-**GemmaLens** bridges this gap. A user simply takes a photo, uploads an image, or clicks a preloaded sample document. The system translates the document into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
+**GemmaLens** eliminates manual mode selection. A user simply takes a photo, uploads an image, or clicks a preloaded sample document. The system **automatically classifies the document**, translates it into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
 
-### Core Assistance Modes
-* **Prescriptions & Medicine:** Extracts drug names, exact dosing intervals (such as every 8 hours), administration instructions, and critical safety warnings (such as penicillin allergies).
-* **Bills & Civic Notices:** Highlights the total amount due, strict deadlines, consequences of non-payment, and step-by-step resolution actions.
-* **Food & Allergens:** Scans ingredient lists for major allergens (nuts, milk, soy, wheat, shellfish) and flags facility cross-contamination advisories.
-* **General Visual:** Answers arbitrary questions about visual objects, diagrams, or printed notices.
+### Core Features
+* **Intelligent Auto-Detection:** Automatically identifies whether an image is a prescription, utility bill, food allergen label, or general document.
+* **Plain Language Summaries:** 5th-grade reading level explanations without clinical or bureaucratic jargon.
+* **Interactive Action Checklist:** Clickable checkboxes to help users step through tasks (e.g. dosing schedule, bill payment, allergen checks).
+* **Follow-Up Doubts & Q&A:** An interactive conversation module allowing users to ask further questions about the document (such as *"Can I take this with milk?"* or *"What happens if I miss the due date?"*).
+* **Scan History Drawer:** Stores previous analyses in browser local storage for instant revisitation.
+* **Verified Free Authoritative Links:** Curates direct reference links to official resources (such as MedlinePlus, FDA, and Benefits.gov) for verified information.
+* **Voice-First Narration (TTS):** Browser-native speech synthesis reads explanations aloud for elderly or visually impaired users.
+* **Clean Single-Screen Flow:** The dropzone and hero automatically hide during analysis, and a prominent **New Scan** button allows returning to the upload state at any time.
 
 ---
 
@@ -57,21 +62,23 @@ GemmaLens relies entirely on open-source technologies with zero cloud dependenci
 
 ```mermaid
 graph LR
-    A["Select Mode or Sample"] --> B["Capture or Upload Image"]
-    B --> C["Local Gemma 4 Inference"]
-    C --> D["Plain Language Summary"]
-    C --> E["Action Checklist"]
-    C --> F["Audio Narration (TTS)"]
+    A["Drop Image or Sample"] --> B["Gemma 4 Vision Processing"]
+    B --> C["Auto-Detect Category"]
+    C --> D["Plain Summary & Checklist"]
+    C --> E["Voice Narration (TTS)"]
+    D --> F["Ask Follow-Up Doubts"]
+    D --> G["Saved to Local History"]
 ```
 
 ### Technical Architecture
 
 ```mermaid
 graph TD
-    Client["Client Interface (macOS Glassmorphism UI)"] -->|POST /api/analyze<br>Base64 Image + Mode| Server["Express.js Application Server (Node.js ESM)"]
+    Client["Client Interface (macOS Glassmorphism UI)"] -->|POST /api/analyze<br>Base64 Image| Server["Express.js Server (Node.js ESM)"]
+    Client -->|POST /api/ask<br>Follow-Up Question| Server
     
     subgraph Local_Host ["Local Machine Environment"]
-        Server -->|Enforce 5th-Grade Schema| PromptEngine["Prompt Construction Engine"]
+        Server -->|Auto-Detect & Schema Engine| PromptEngine["Prompt Construction Engine"]
         PromptEngine -->|POST /api/generate| OllamaDaemon["Ollama Daemon (localhost:11434)"]
         OllamaDaemon -->|CLIP Vision + LLM| Gemma4["Google Gemma 4 Model"]
         Gemma4 -->|Reasoning Stream + JSON| Parser["Telemetry & Schema Parser"]
@@ -115,11 +122,24 @@ Open your browser to:
 http://localhost:3000
 ```
 
-> **Evaluation Tip:** On first load, select any of the preloaded sample documents on the home screen (*Prescription*, *Utility Notice*, or *Allergen Label*) to test live Gemma 4 vision inference immediately without uploading personal files.
+> **Evaluation Tip:** On first load, click any of the **Sample Documents** on the home screen (*Prescription*, *Utility Notice*, or *Allergen Label*) to test live Gemma 4 vision inference immediately without uploading personal files.
 
 ---
 
-## 5. Project Directory Structure
+## 5. Chrome Extension Companion
+
+GemmaLens includes a companion browser extension in the [`extension/`](extension/) directory, allowing users to snapshot and explain any webpage (such as patient portals, complex billing invoices, or online ingredient lists):
+
+### Installation
+1. Open Google Chrome, Brave, or Microsoft Edge.
+2. Navigate to `chrome://extensions/`.
+3. Enable **Developer mode** (top-right toggle).
+4. Click **Load unpacked** and select the [`extension/`](extension/) folder from this repository.
+5. While browsing any website, click the GemmaLens extension icon and select **Explain This Web Page** to run local Gemma 4 vision analysis on the visible tab.
+
+---
+
+## 6. Project Directory Structure
 
 ```
 HacktoberFest-26/
@@ -127,6 +147,11 @@ HacktoberFest-26/
 ├── README.md               # Comprehensive project documentation
 ├── package.json            # Project manifest and scripts
 ├── .gitignore              # Git exclusions for dependencies and internal trackers
+├── extension/              # Chrome extension companion (Manifest V3)
+│   ├── manifest.json       # Extension manifest
+│   ├── popup.html          # Extension popup interface
+│   ├── popup.js            # Tab capture & local bridge logic
+│   └── icon.png            # Extension icon
 ├── src/
 │   └── server/
 │       ├── index.js        # Express application server and static hosting
@@ -148,16 +173,17 @@ HacktoberFest-26/
 
 ---
 
-## 6. Design System & Accessibility
+## 7. Design System & Accessibility
 
-* **macOS-Inspired Glassmorphism:** Clean, neutral palette with frosted glass cards (`rgba(255, 255, 255, 0.78)` with `backdrop-filter: blur(24px)`), soft shadows, and Apple-style segmented controls.
-* **Zero Visual Clutter:** Removed excessive icons, emojis, and marketing slogans. Employs clean SVG stroke icons and legible typography.
+* **macOS-Inspired Glassmorphism:** Clean, neutral palette with frosted glass cards (`rgba(255, 255, 255, 0.78)` with `backdrop-filter: blur(24px)`), soft shadows, and clean buttons.
+* **Zero Visual Clutter:** No emojis or AI jargon. Employs crisp monochrome SVG stroke icons and legible typography.
 * **Adjustable Typography:** Dynamic text scaling controls (`A-` and `A+`) allow instant resizing of the interface for low-vision and elderly users.
 * **Interactive Checklist:** Action items feature clickable checkboxes to support cognitive clarity and task tracking.
+* **Scan History & New Scan Reset:** Easily revisit previous scans via the history drawer or start fresh with a single click.
 
 ---
 
-## 7. Authors & Credits
+## 8. Authors & Credits
 
 * **Kavan** — Project Author & Maintainer &bull; [GitHub Profile](https://github.com/Kavan)
 * **Event:** Hacktoberfest Hack Day 2026 (Major League Hacking)
@@ -167,6 +193,6 @@ HacktoberFest-26/
 
 ---
 
-## 8. License
+## 9. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.

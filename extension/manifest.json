@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "GemmaLens — Universal Visual Assistant",
+  "version": "1.0.0",
+  "description": "Chrome companion for GemmaLens. Snapshots web pages, medical portals, and fine print, explaining them in plain language via local Gemma 4.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Explain Page with GemmaLens"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

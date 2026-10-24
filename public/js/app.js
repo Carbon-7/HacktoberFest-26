@@ -1,6 +1,6 @@
 /**
  * GemmaLens Frontend Application Controller
- * macOS-Inspired Clean Interface, Natural Voice Narration, and Zero Clutter.
+ * Auto-Detection, Clean Transition Flow, Follow-Up Q&A, and Scan History.
  */
 
 import { AudioEngine } from './audio.js';
@@ -8,17 +8,19 @@ import { AudioEngine } from './audio.js';
 class GemmaLensApp {
   constructor() {
     this.audio = new AudioEngine();
-    this.currentMode = 'medicine';
     this.currentImageBase64 = null;
+    this.currentAnalysisResult = null;
     this.presets = [];
     this.isAnalyzing = false;
     this.loadingInterval = null;
     this.fontScale = 1.0;
+    this.history = this.loadHistoryFromStorage();
 
     this.initElements();
     this.bindEvents();
     this.checkHealth();
     this.loadPresets();
+    this.updateHistoryUI();
   }
 
   initElements() {
@@ -27,9 +29,12 @@ class GemmaLensApp {
     this.statusText = document.getElementById('statusText');
     this.fontDecBtn = document.getElementById('fontDecBtn');
     this.fontIncBtn = document.getElementById('fontIncBtn');
+    this.historyToggleBtn = document.getElementById('historyToggleBtn');
+    this.historyCount = document.getElementById('historyCount');
+    this.brandHomeLink = document.getElementById('brandHomeLink');
 
-    // Mode Selector & Ingestion
-    this.segmentItems = document.querySelectorAll('.segment-item');
+    // Ingestion Stage Elements
+    this.ingestionStage = document.getElementById('ingestionStage');
     this.dropzoneCard = document.getElementById('dropzoneCard');
     this.fileInput = document.getElementById('fileInput');
     this.cameraBtn = document.getElementById('cameraBtn');
@@ -40,6 +45,7 @@ class GemmaLensApp {
     this.loadingTitle = document.getElementById('loadingTitle');
     this.loadingDesc = document.getElementById('loadingDesc');
     this.resultsSection = document.getElementById('resultsSection');
+    this.newScanBtn = document.getElementById('newScanBtn');
     this.resultTitle = document.getElementById('resultTitle');
     this.resultCategoryBadge = document.getElementById('resultCategoryBadge');
     this.previewImage = document.getElementById('previewImage');
@@ -49,14 +55,29 @@ class GemmaLensApp {
     this.alertCardWarning = document.getElementById('alertCardWarning');
     this.alertTitle = document.getElementById('alertTitle');
     this.alertDescription = document.getElementById('alertDescription');
+    this.linksCard = document.getElementById('linksCard');
+    this.helpfulLinksList = document.getElementById('helpfulLinksList');
     this.technicalDetails = document.getElementById('technicalDetails');
     this.technicalSummary = document.getElementById('technicalSummary');
     this.technicalContent = document.getElementById('technicalContent');
+
+    // Q&A Follow-Up Elements
+    this.qnaForm = document.getElementById('qnaForm');
+    this.qnaInput = document.getElementById('qnaInput');
+    this.qnaConversation = document.getElementById('qnaConversation');
+    this.qnaSubmitBtn = document.getElementById('qnaSubmitBtn');
 
     // Audio Playback
     this.audioPlayBtn = document.getElementById('audioPlayBtn');
     this.audioPlayLabel = document.getElementById('audioPlayLabel');
     this.soundwaveBox = document.getElementById('soundwaveBox');
+
+    // History Drawer
+    this.historyDrawer = document.getElementById('historyDrawer');
+    this.drawerBackdrop = document.getElementById('drawerBackdrop');
+    this.closeHistoryBtn = document.getElementById('closeHistoryBtn');
+    this.clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    this.historyList = document.getElementById('historyList');
 
     // Camera Dialog
     this.cameraOverlay = document.getElementById('cameraOverlay');
@@ -66,14 +87,12 @@ class GemmaLensApp {
   }
 
   bindEvents() {
-    // Segmented Mode Selector
-    this.segmentItems.forEach(item => {
-      item.addEventListener('click', () => {
-        this.segmentItems.forEach(s => s.classList.remove('active'));
-        item.classList.add('active');
-        this.currentMode = item.dataset.mode;
-      });
+    // Brand Link & New Scan
+    this.brandHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.resetToNewScan();
     });
+    this.newScanBtn.addEventListener('click', () => this.resetToNewScan());
 
     // File Drag & Drop
     this.dropzoneCard.addEventListener('dragover', (e) => {
@@ -113,6 +132,18 @@ class GemmaLensApp {
       }
     };
 
+    // Follow-up Q&A Submission
+    this.qnaForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.submitFollowUpQuestion();
+    });
+
+    // History Drawer Handlers
+    this.historyToggleBtn.addEventListener('click', () => this.toggleHistoryDrawer(true));
+    this.closeHistoryBtn.addEventListener('click', () => this.toggleHistoryDrawer(false));
+    this.drawerBackdrop.addEventListener('click', () => this.toggleHistoryDrawer(false));
+    this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+
     // Font Scaling Controls
     this.fontIncBtn.addEventListener('click', () => {
       this.fontScale = Math.min(1.3, this.fontScale + 0.08);
@@ -123,6 +154,22 @@ class GemmaLensApp {
       this.fontScale = Math.max(0.85, this.fontScale - 0.08);
       document.documentElement.style.setProperty('--user-scale', `${this.fontScale}rem`);
     });
+  }
+
+  resetToNewScan() {
+    this.audio.stop();
+    this.currentImageBase64 = null;
+    this.currentAnalysisResult = null;
+    this.fileInput.value = '';
+    this.qnaConversation.innerHTML = '';
+    this.qnaInput.value = '';
+
+    // Switch visibility back to Ingestion Stage
+    this.resultsSection.style.display = 'none';
+    this.loadingCard.style.display = 'none';
+    this.ingestionStage.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async checkHealth() {
@@ -171,21 +218,12 @@ class GemmaLensApp {
           <p>${this.escapeHtml(preset.subtitle)}</p>
         </div>
       `;
-      card.addEventListener('click', () => this.selectPreset(preset));
+      card.addEventListener('click', () => {
+        this.currentImageBase64 = preset.image;
+        this.startAnalysis();
+      });
       this.presetsGrid.appendChild(card);
     });
-  }
-
-  selectPreset(preset) {
-    // Synchronize mode
-    this.segmentItems.forEach(item => {
-      if (item.dataset.mode === preset.mode) {
-        item.click();
-      }
-    });
-
-    this.currentImageBase64 = preset.image;
-    this.startAnalysis();
   }
 
   handleImageFile(file) {
@@ -264,14 +302,16 @@ class GemmaLensApp {
   }
 
   startLoadingAnimation() {
-    this.loadingCard.style.display = 'block';
+    // Hide dropzone, presets, and hero completely
+    this.ingestionStage.style.display = 'none';
     this.resultsSection.style.display = 'none';
+    this.loadingCard.style.display = 'block';
 
     const steps = [
-      { title: 'Analyzing visual details...', desc: 'Processing document with Gemma 4 Vision' },
-      { title: 'Identifying key information...', desc: 'Reading text, labels, dosage, and warnings' },
-      { title: 'Simplifying explanations...', desc: 'Translating into plain everyday language' },
-      { title: 'Finalizing voice summary...', desc: 'Preparing spoken narration script' }
+      { title: 'Detecting document type...', desc: 'Gemma 4 Vision classifying category' },
+      { title: 'Reading key details...', desc: 'Extracting dosage, deadlines, or ingredient information' },
+      { title: 'Translating into plain words...', desc: 'Generating 5th-grade explanation and checklist' },
+      { title: 'Synthesizing voice narration...', desc: 'Finalizing response' }
     ];
 
     let stepIdx = 0;
@@ -301,8 +341,7 @@ class GemmaLensApp {
     this.startLoadingAnimation();
 
     const payload = {
-      image: this.currentImageBase64,
-      mode: this.currentMode
+      image: this.currentImageBase64
     };
 
     try {
@@ -317,9 +356,12 @@ class GemmaLensApp {
         throw new Error(result.error || 'Failed to analyze document');
       }
 
+      this.currentAnalysisResult = result;
+      this.saveToHistory(result, this.currentImageBase64);
       this.displayResults(result);
     } catch (err) {
       alert('Analysis Error: ' + err.message + '\n\nPlease ensure Ollama daemon is running with Gemma 4 on localhost:11434.');
+      this.resetToNewScan();
     } finally {
       this.isAnalyzing = false;
       this.stopLoadingAnimation();
@@ -331,7 +373,7 @@ class GemmaLensApp {
 
     // Header & Preview Image
     this.resultTitle.textContent = data.title || 'Visual Analysis Result';
-    this.resultCategoryBadge.textContent = this.formatModeLabel(result.mode);
+    this.resultCategoryBadge.textContent = data.category || result.category || 'Auto-Detected';
     this.previewImage.src = this.currentImageBase64;
 
     // Plain Explanation
@@ -372,7 +414,7 @@ class GemmaLensApp {
       });
     }
 
-    // Warning / Alert Banner (Only displayed if critical warnings exist)
+    // Critical Warnings Banner
     if (data.criticalWarnings && data.criticalWarnings.length > 0) {
       const topWarning = data.criticalWarnings[0];
       this.alertTitle.textContent = topWarning.title || 'Important Notice';
@@ -382,7 +424,35 @@ class GemmaLensApp {
       this.alertCardWarning.style.display = 'none';
     }
 
-    // Technical Inspection Accordion (Collapsed by default)
+    // Verified Authoritative Links
+    this.helpfulLinksList.innerHTML = '';
+    const links = data.helpfulLinks || this.getDefaultLinksForCategory(data.category, data.title);
+    if (links && links.length > 0) {
+      links.forEach(l => {
+        const a = document.createElement('a');
+        a.className = 'helpful-link-item';
+        a.href = l.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.innerHTML = `
+          <div>
+            <div class="helpful-link-title">${this.escapeHtml(l.title)} &rarr;</div>
+            <div class="helpful-link-desc">${this.escapeHtml(l.description || 'Verified official information')}</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-tertiary);">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        `;
+        this.helpfulLinksList.appendChild(a);
+      });
+      this.linksCard.style.display = 'block';
+    } else {
+      this.linksCard.style.display = 'none';
+    }
+
+    // Technical Inspection Accordion
     if (result.thinking && result.thinking.trim()) {
       this.technicalDetails.style.display = 'block';
       this.technicalContent.textContent = result.thinking;
@@ -393,20 +463,103 @@ class GemmaLensApp {
       this.technicalDetails.style.display = 'none';
     }
 
-    // Prepare Narration Script
+    // Audio Script
     this.currentAudioScript = data.audioReadAloudScript || `${data.title}. ${data.plainSummary}`;
 
-    // Reveal results and scroll smoothly
+    // Reveal results and smoothly scroll
     this.resultsSection.style.display = 'block';
     this.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  formatModeLabel(mode) {
-    switch (mode) {
-      case 'medicine': return 'Prescription';
-      case 'bill': return 'Bill & Notice';
-      case 'label': return 'Food & Allergen';
-      default: return 'General Visual';
+  getDefaultLinksForCategory(category = '', title = '') {
+    const encoded = encodeURIComponent(title);
+    if (/prescription|medicine|med/i.test(category)) {
+      return [
+        {
+          title: 'MedlinePlus Drug & Medication Guide (NIH)',
+          url: `https://medlineplus.gov/druginformation.html`,
+          description: 'Official US National Library of Medicine safety guidelines'
+        },
+        {
+          title: 'FDA Consumer Drug Safety Portal',
+          url: 'https://www.fda.gov/drugs',
+          description: 'Official recalls, warnings, and patient information'
+        }
+      ];
+    } else if (/bill|notice|civic/i.test(category)) {
+      return [
+        {
+          title: 'National Consumer Law Center & Hardship Assistance',
+          url: 'https://www.nclc.org',
+          description: 'Citizen legal rights and utility protection guidelines'
+        },
+        {
+          title: 'Benefits.gov Citizen Assistance Finder',
+          url: 'https://www.benefits.gov',
+          description: 'Check official government utility subsidies and grants'
+        }
+      ];
+    } else if (/food|allergen|label/i.test(category)) {
+      return [
+        {
+          title: 'FDA Food Allergens Guidance & Alerts',
+          url: 'https://www.fda.gov/food/food-labeling-nutrition/food-allergies',
+          description: 'Official Food Allergen Labeling & Consumer Protection standard'
+        }
+      ];
+    }
+    return [];
+  }
+
+  async submitFollowUpQuestion() {
+    const question = this.qnaInput.value.trim();
+    if (!question || !this.currentImageBase64) return;
+
+    this.qnaInput.value = '';
+    this.qnaSubmitBtn.disabled = true;
+
+    // Render User Message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'qna-bubble qna-bubble-user';
+    userMsg.textContent = question;
+    this.qnaConversation.appendChild(userMsg);
+
+    // Render Temporary AI Loading Bubble
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'qna-bubble qna-bubble-ai';
+    aiMsg.textContent = 'Gemma 4 is reviewing the document...';
+    this.qnaConversation.appendChild(aiMsg);
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: this.currentImageBase64,
+          previousAnalysis: this.currentAnalysisResult ? this.currentAnalysisResult.data : {},
+          question: question
+        })
+      });
+
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Could not process question');
+
+      aiMsg.innerHTML = `
+        <div>${this.escapeHtml(json.answer)}</div>
+        ${json.actionTip ? `<div class="tip">Tip: ${this.escapeHtml(json.actionTip)}</div>` : ''}
+        <button class="scale-btn" style="margin-top: 0.4rem; padding: 2px 8px;" id="qnaSpeakBtn">Listen</button>
+      `;
+
+      const speakBtn = aiMsg.querySelector('#qnaSpeakBtn');
+      if (speakBtn) {
+        speakBtn.addEventListener('click', () => {
+          this.audio.speak(json.readAloud || json.answer);
+        });
+      }
+    } catch (err) {
+      aiMsg.textContent = 'Sorry, could not answer right now: ' + err.message;
+    } finally {
+      this.qnaSubmitBtn.disabled = false;
     }
   }
 
@@ -417,6 +570,90 @@ class GemmaLensApp {
       if (this.currentAudioScript) {
         this.audio.speak(this.currentAudioScript);
       }
+    }
+  }
+
+  // --- Scan History Management ---
+  loadHistoryFromStorage() {
+    try {
+      const raw = localStorage.getItem('gemmalens_history');
+      return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  saveToHistory(result, imageBase64) {
+    const entry = {
+      id: Date.now().toString(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toLocaleDateString(),
+      title: result.data.title || 'Scanned Document',
+      category: result.data.category || result.category || 'Document',
+      image: imageBase64,
+      result: result
+    };
+
+    this.history.unshift(entry);
+    if (this.history.length > 20) this.history.pop();
+
+    try {
+      localStorage.setItem('gemmalens_history', JSON.stringify(this.history));
+    } catch (e) {
+      console.warn('LocalStorage full, dropping older entries:', e);
+    }
+
+    this.updateHistoryUI();
+  }
+
+  updateHistoryUI() {
+    this.historyCount.textContent = this.history.length;
+    this.historyList.innerHTML = '';
+
+    if (this.history.length === 0) {
+      this.historyList.innerHTML = '<div class="history-empty">No previous scans yet.</div>';
+      return;
+    }
+
+    this.history.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'history-item-card';
+      card.innerHTML = `
+        <div class="history-thumb">
+          <img src="${item.image}" alt="">
+        </div>
+        <div class="history-meta">
+          <h5>${this.escapeHtml(item.title)}</h5>
+          <span>${this.escapeHtml(item.category)} &bull; ${item.timestamp}</span>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        this.toggleHistoryDrawer(false);
+        this.currentImageBase64 = item.image;
+        this.currentAnalysisResult = item.result;
+        this.ingestionStage.style.display = 'none';
+        this.loadingCard.style.display = 'none';
+        this.displayResults(item.result);
+      });
+      this.historyList.appendChild(card);
+    });
+  }
+
+  toggleHistoryDrawer(open) {
+    if (open) {
+      this.historyDrawer.classList.add('open');
+      this.drawerBackdrop.classList.add('open');
+    } else {
+      this.historyDrawer.classList.remove('open');
+      this.drawerBackdrop.classList.remove('open');
+    }
+  }
+
+  clearHistory() {
+    if (confirm('Clear all scan history?')) {
+      this.history = [];
+      localStorage.removeItem('gemmalens_history');
+      this.updateHistoryUI();
     }
   }
 

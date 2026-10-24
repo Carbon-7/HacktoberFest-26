@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkOllamaHealth, analyzeImageWithGemma4 } from './ollamaClient.js';
-import { buildPrompt, MODE_CONFIGS } from './prompts.js';
+import { buildPrompt, buildFollowUpPrompt } from './prompts.js';
 import { PRESETS } from './presetsData.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,15 +29,15 @@ app.get('/api/health', async (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date().toISOString(),
-    service: 'GemmaLens Multimodal Assistant',
+    service: 'GemmaLens Universal Visual Assistant',
     ollama: ollamaStatus,
-    availableModes: Object.keys(MODE_CONFIGS)
+    capabilities: ['auto-detection', 'follow-up-qa', 'local-vision', 'speech-narration']
   });
 });
 
 /**
  * GET /api/presets
- * Returns preloaded test presets with image data for 1-click judge evaluation.
+ * Returns preloaded test presets with image data for 1-click evaluation.
  */
 app.get('/api/presets', (req, res) => {
   try {
@@ -60,10 +60,10 @@ app.get('/api/presets', (req, res) => {
 
 /**
  * POST /api/analyze
- * Analyzes an uploaded image or preset with Gemma 4.
+ * Analyzes an uploaded image or preset with Gemma 4 using intelligent auto-detection.
  */
 app.post('/api/analyze', async (req, res) => {
-  const { image, mode = 'medicine', query = '', model } = req.body;
+  const { image, query = '', model } = req.body;
 
   if (!image) {
     return res.status(400).json({
@@ -73,17 +73,18 @@ app.post('/api/analyze', async (req, res) => {
   }
 
   try {
-    const prompt = buildPrompt(mode, query);
+    const prompt = buildPrompt(query);
     const result = await analyzeImageWithGemma4({
       base64Image: image,
       prompt: prompt,
       model: model || 'gemma4'
     });
 
+    const category = result.data.category || 'General Visual';
+
     res.json({
       success: true,
-      mode,
-      modeName: MODE_CONFIGS[mode]?.name || 'Universal Visual Assistant',
+      category: category,
       data: result.data,
       thinking: result.thinking,
       metrics: result.metrics
@@ -100,6 +101,44 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/ask
+ * Handles follow-up questions about an already analyzed document.
+ */
+app.post('/api/ask', async (req, res) => {
+  const { image, previousAnalysis = {}, question = '', model } = req.body;
+
+  if (!question || !question.trim()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required field: question'
+    });
+  }
+
+  try {
+    const prompt = buildFollowUpPrompt(previousAnalysis, question);
+    const result = await analyzeImageWithGemma4({
+      base64Image: image || previousAnalysis.image,
+      prompt: prompt,
+      model: model || 'gemma4'
+    });
+
+    res.json({
+      success: true,
+      answer: result.data.answer || result.data.plainSummary || 'I reviewed the document regarding your question.',
+      actionTip: result.data.actionTip || null,
+      readAloud: result.data.readAloud || result.data.audioReadAloudScript || null,
+      thinking: result.thinking
+    });
+  } catch (err) {
+    console.error('Follow-up error:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Error processing follow-up question'
+    });
+  }
+});
+
 // Fallback route for SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/index.html'));
@@ -110,6 +149,6 @@ app.listen(PORT, () => {
   console.log(`\n------------------------------------------------------`);
   console.log(`GemmaLens server running at: http://localhost:${PORT}`);
   console.log(`Model: Google Gemma 4 (7.5B) via local Ollama`);
-  console.log(`Mode: macOS-inspired Light Glassmorphism UI`);
+  console.log(`Features: Auto-Detection, Follow-Up Q&A, Audio Narration`);
   console.log(`------------------------------------------------------\n`);
 });
