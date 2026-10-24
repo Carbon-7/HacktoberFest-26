@@ -18,7 +18,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve static frontend from public directory
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../../public')));
 
 /**
  * GET /api/health
@@ -102,14 +102,14 @@ app.post('/api/analyze', async (req, res) => {
 
 // Fallback route for SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../../public/index.html'));
 });
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`\n======================================================`);
-  console.log(`🚀 GemmaLens server running at: http://localhost:${PORT}`);
-  console.log(`⚡ Connected to local Ollama with Gemma 4`);
-  console.log(`♿ Theme: AI for Everyone | Multimodal & Audio-First`);
-  console.log(`======================================================\n`);
+  console.log(`\n------------------------------------------------------`);
+  console.log(`GemmaLens server running at: http://localhost:${PORT}`);
+  console.log(`Model: Google Gemma 4 (7.5B) via local Ollama`);
+  console.log(`Mode: macOS-inspired Light Glassmorphism UI`);
+  console.log(`------------------------------------------------------\n`);
 });

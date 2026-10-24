@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function getPresetBase64(filename) {
-  const filePath = path.join(__dirname, '../public/assets/presets', filename);
+  const filePath = path.join(__dirname, '../../public/assets/presets', filename);
   if (fs.existsSync(filePath)) {
     const buffer = fs.readFileSync(filePath);
     return `data:image/png;base64,${buffer.toString('base64')}`;

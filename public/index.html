@@ -3,250 +3,258 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GemmaLens — Multimodal Visual Assistant for Everyone</title>
-  <meta name="description" content="Local, open-source multimodal visual assistant powered by Google Gemma 4. Demystifies medicine labels, confusing utility bills, and food allergens with plain language and voice narration.">
+  <title>GemmaLens — Visual Assistant for Everyone</title>
+  <meta name="description" content="Local, open-source multimodal visual assistant powered by Google Gemma 4. Demystifies medicine labels, utility bills, and food allergens in plain language with voice narration.">
   
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366F1'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230071E3'><circle cx='12' cy='12' r='9'/></svg>">
 </head>
 <body>
 
-  <!-- App Header -->
+  <!-- Header Bar -->
   <header class="app-header" role="banner">
     <div class="header-inner">
       <a href="#" class="brand-wrapper" aria-label="GemmaLens Home">
-        <div class="brand-icon-halo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="21.17" y1="8" x2="12" y2="8"></line>
+            <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+            <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
           </svg>
         </div>
         <div class="brand-text">
-          <h1>Gemma<span class="gradient-text">Lens</span></h1>
-          <p>Multimodal AI for Everyone</p>
+          <h1>GemmaLens</h1>
+          <p>Universal Visual Assistant</p>
         </div>
       </a>
 
-      <!-- Status & Accessibility Controls -->
+      <!-- Status & Font Controls -->
       <div class="header-actions">
-        <div class="ollama-pill" id="ollamaPill" role="status" aria-live="polite">
-          <span class="pulse-dot" id="statusDot"></span>
-          <span id="statusText">Checking Ollama...</span>
+        <div class="system-status" id="systemStatus" role="status" aria-live="polite">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking local model...</span>
         </div>
 
-        <div class="a11y-toolbar" role="toolbar" aria-label="Accessibility Settings">
-          <button class="a11y-btn" id="fontDecBtn" title="Decrease font size" aria-label="Decrease text size">A-</button>
-          <button class="a11y-btn" id="fontIncBtn" title="Increase font size" aria-label="Increase text size">A+</button>
-          <button class="a11y-btn" id="contrastToggle" title="Toggle high contrast mode" aria-label="Toggle high contrast">◐ High Contrast</button>
+        <div class="font-scale-control" role="toolbar" aria-label="Text Size Controls">
+          <button class="scale-btn" id="fontDecBtn" title="Decrease font size" aria-label="Decrease font size">A-</button>
+          <button class="scale-btn" id="fontIncBtn" title="Increase font size" aria-label="Increase font size">A+</button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="app-container" role="main">
+  <!-- Main Content Layout -->
+  <main class="main-wrapper" role="main">
     
     <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    <section class="hero-card">
+      <div class="hero-pill-tag">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
         </svg>
-        <span>Google Gemma 4 (7.5B) • 100% Local Inference • Zero Cloud Dependencies</span>
+        <span>Google Gemma 4 (7.5B) &bull; 100% Local Inference &bull; Private & Offline</span>
       </div>
-      <h2 class="hero-title">Understand the Physical World in Plain Words</h2>
+      <h2 class="hero-title">Visual Assistance for Everyone</h2>
       <p class="hero-subtitle">
-        Empowering patients, elderly citizens, and families to demystify complex medicine prescriptions, threatening utility bills, and hazardous food allergens with instant voice narration.
+        Understand medicine labels, utility bills, and food packaging in plain everyday language with one-click voice narration.
       </p>
     </section>
 
-    <!-- Mode Selector Pills -->
-    <section class="mode-selection" aria-label="Select Assistance Mode">
-      <div class="mode-selector" role="tablist">
-        <button class="mode-pill active" role="tab" aria-selected="true" data-mode="medicine">
-          <span>💊 Medicine & Rx</span>
+    <!-- Segmented Mode Bar -->
+    <section class="segmented-control-container" aria-label="Assistance Category Selector">
+      <div class="segmented-control" role="tablist">
+        <button class="segment-item active" role="tab" aria-selected="true" data-mode="medicine">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+            <path d="m8.5 8.5 7 7"></path>
+          </svg>
+          <span>Prescriptions</span>
         </button>
-        <button class="mode-pill" role="tab" aria-selected="false" data-mode="bill">
-          <span>📄 Bills & Civic</span>
+        <button class="segment-item" role="tab" aria-selected="false" data-mode="bill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Bills & Notices</span>
         </button>
-        <button class="mode-pill" role="tab" aria-selected="false" data-mode="label">
-          <span>🥗 Food & Allergens</span>
+        <button class="segment-item" role="tab" aria-selected="false" data-mode="label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+          <span>Food & Allergens</span>
         </button>
-        <button class="mode-pill" role="tab" aria-selected="false" data-mode="general">
-          <span>🔍 Universal Visual</span>
+        <button class="segment-item" role="tab" aria-selected="false" data-mode="general">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>General</span>
         </button>
       </div>
     </section>
 
-    <!-- 1-Click Preset Gallery -->
-    <section class="presets-section" aria-label="Quick Evaluation Samples">
-      <div class="section-label">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polygon points="10 8 16 12 10 16 10 8"></polygon>
+    <!-- Visual Sample Presets -->
+    <section class="presets-tray" aria-label="Visual Sample Cards">
+      <div class="presets-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+          <circle cx="9" cy="9" r="2"></circle>
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
         </svg>
-        <span>Instant 1-Click Evaluation Presets (Click any card to analyze live)</span>
+        <span>Sample Documents (Click to test instantly)</span>
       </div>
-      <div class="preset-grid" id="presetsGrid">
-        <!-- Rendered dynamically by app.js -->
+      <div class="presets-grid" id="presetsGrid">
+        <!-- Injected via JavaScript -->
       </div>
     </section>
 
-    <!-- Input / Dropzone Stage -->
-    <section class="input-stage" id="inputStage" aria-label="Image Upload Zone">
-      <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="17 8 12 3 7 8"></polyline>
-        <line x1="12" y1="3" x2="12" y2="15"></line>
-      </svg>
-      <h2>Drag & Drop Any Image Here</h2>
-      <p>Or upload a document, photo of prescription, bill notice, or food packaging</p>
+    <!-- Ingestion Dropzone -->
+    <section class="dropzone-card" id="dropzoneCard" aria-label="Document Upload Area">
+      <div class="dropzone-icon-circle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      </div>
+      <h3>Drop an image here</h3>
+      <p>Supports photos of medicine bottles, letters, notices, or ingredient labels</p>
 
-      <div class="input-actions">
-        <label for="fileInput" class="btn-primary" role="button" tabindex="0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="dropzone-button-row">
+        <label for="fileInput" class="btn-macos-primary" role="button" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
             <circle cx="9" cy="9" r="2"></circle>
             <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
           </svg>
-          <span>Choose Image File</span>
+          <span>Choose Image</span>
         </label>
         <input type="file" id="fileInput" accept="image/*" style="display:none;">
 
-        <button class="btn-secondary" id="cameraBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="btn-macos-secondary" id="cameraBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
             <circle cx="12" cy="13" r="3"></circle>
           </svg>
-          <span>Take Camera Snapshot</span>
+          <span>Camera Snapshot</span>
         </button>
       </div>
-
-      <div class="optional-query-wrapper">
-        <input type="text" id="queryInput" class="query-input" placeholder="Optional: Ask a specific question about this image...">
-      </div>
     </section>
 
-    <!-- Loading Shimmer & Thinking Progress -->
-    <section class="loading-panel" id="loadingPanel" role="status" aria-live="assertive">
-      <div class="spinner-orbit"></div>
-      <div class="loading-step-text" id="loadingStepText">Inspecting visual details with Gemma 4 Vision...</div>
-      <div class="loading-subtext" id="loadingSubtext">Preprocessing image and activating CLIP projector</div>
+    <!-- Loading State -->
+    <section class="loading-card" id="loadingCard" role="status" aria-live="assertive">
+      <div class="loading-spinner"></div>
+      <div class="loading-title" id="loadingTitle">Analyzing document with Gemma 4...</div>
+      <div class="loading-desc" id="loadingDesc">Reading visual details and translating into plain language</div>
     </section>
 
-    <!-- Results Stage (Multimodal Dashboard) -->
-    <section class="results-stage" id="resultsStage" aria-label="Visual Analysis Results">
+    <!-- Results Dashboard -->
+    <section class="results-section" id="resultsSection" aria-label="Analysis Results">
       
-      <!-- Results Header & Audio Control -->
-      <div class="results-header-card">
-        <div class="results-header-info">
-          <span class="mode-tag" id="resultModeTag">Mode: Medicine</span>
+      <!-- Top Action Bar -->
+      <div class="results-top-bar">
+        <div class="result-heading-box">
+          <span class="result-badge" id="resultCategoryBadge">Prescription</span>
           <h2 id="resultTitle">Analysis Result</h2>
         </div>
 
-        <div class="audio-player-control">
-          <button class="btn-tts" id="ttsBtn" aria-label="Read aloud explanation">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="audio-action-container">
+          <button class="btn-audio-play" id="audioPlayBtn" aria-label="Listen to explanation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
             </svg>
+            <span id="audioPlayLabel">Listen</span>
           </button>
-          <div class="soundwave-indicator" id="soundwave">
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
+          <div class="soundwave-box" id="soundwaveBox">
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
+            <div class="wave-line"></div>
           </div>
-          <span style="font-size: 0.85rem; font-weight: 600;" id="ttsLabel">Read Aloud</span>
         </div>
       </div>
 
-      <!-- Main Results Grid -->
-      <div class="results-grid">
+      <!-- Main Result Split Grid -->
+      <div class="results-grid-layout">
         
-        <!-- Left: Image Preview Thumbnail -->
-        <div class="image-preview-panel">
-          <div class="section-label">Analyzed Document</div>
-          <div class="analyzed-img-container">
-            <img id="previewImg" src="" alt="Analyzed Document Preview">
-          </div>
+        <!-- Left: Image Preview -->
+        <div class="document-preview-box">
+          <img id="previewImage" src="" alt="Analyzed Document">
         </div>
 
-        <!-- Right: 3-Pillar Breakdown -->
-        <div class="pillars-container">
+        <!-- Right: Clarity Cards -->
+        <div class="insights-column">
           
-          <!-- Pillar 1: 5th-Grade Plain Language Summary -->
-          <div class="pillar-card">
-            <div class="pillar-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#10B981">
+          <!-- Plain Language Summary -->
+          <div class="insight-card">
+            <div class="insight-card-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="m9 12 2 2 4-4"></path>
               </svg>
-              <span>Plain Language Summary (5th-Grade Level)</span>
+              <span>Plain Summary</span>
             </div>
-            <p class="plain-summary-text" id="plainSummary"></p>
+            <p class="plain-explanation-body" id="plainExplanation"></p>
           </div>
 
-          <!-- Pillar 2: Action Steps Checklist -->
-          <div class="pillar-card">
-            <div class="pillar-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#06B6D4">
+          <!-- Action Checklist -->
+          <div class="insight-card">
+            <div class="insight-card-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="9 11 12 14 22 4"></polyline>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
               </svg>
-              <span>Action Steps Checklist</span>
+              <span>What To Do</span>
             </div>
-            <ul class="checklist-list" id="checklistUl"></ul>
+            <div class="action-checklist-group" id="checklistGroup"></div>
           </div>
 
-          <!-- Key Details Table -->
-          <div class="pillar-card">
-            <div class="pillar-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#818CF8">
+          <!-- Key Metrics -->
+          <div class="insight-card">
+            <div class="insight-card-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                <path d="M3 9h18"></path>
-                <path d="M9 21V9"></path>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
               </svg>
-              <span>Key Extracted Details</span>
+              <span>Key Details</span>
             </div>
-            <div class="details-grid" id="detailsGrid"></div>
+            <div class="metrics-pill-grid" id="metricsPillGrid"></div>
           </div>
 
-          <!-- Pillar 3: Critical Warnings & Red Flags -->
-          <div class="pillar-card danger" id="warningsCard">
-            <div class="pillar-title" style="color: #F43F5E;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Alert Banner (Shown only if warnings exist) -->
+          <div class="alert-card-warning" id="alertCardWarning" style="display:none;">
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
                 <line x1="12" y1="9" x2="12" y2="13"></line>
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
-              <span>Critical Warnings & Red Flags</span>
-            </div>
-            <div id="warningsContainer"></div>
+              <span id="alertTitle">Safety Note</span>
+            </h4>
+            <p id="alertDescription"></p>
           </div>
 
-          <!-- Cognitive Transparency: Gemma 4 Thinking Process -->
-          <details class="thinking-accordion" id="thinkingDetails">
-            <summary class="thinking-summary">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m18 16 4-4-4-4"></path>
-                  <path d="m6 8-4 4 4 4"></path>
-                  <path d="m14.5 4-5 16"></path>
-                </svg>
-                <span>Gemma 4 Cognitive Reasoning Chain</span>
-              </div>
-              <span class="thinking-metrics-pill" id="thinkingMetrics">Verified</span>
-            </summary>
-            <div class="thinking-body" id="thinkingBody"></div>
-          </details>
+          <!-- Technical Inspection (Discreet Accordion at bottom for evaluation) -->
+          <div class="technical-toggle-box">
+            <details id="technicalDetails">
+              <summary id="technicalSummary">Technical Reasoning Trace</summary>
+              <div class="technical-content" id="technicalContent"></div>
+            </details>
+          </div>
 
         </div>
       </div>
@@ -254,17 +262,17 @@
 
   </main>
 
-  <!-- Camera Snapshot Modal -->
-  <div class="modal-overlay" id="cameraModal" role="dialog" aria-modal="true" aria-label="Camera Capture Dialog">
-    <div class="modal-content">
-      <h3>Take Document Snapshot</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Center your medicine package, bill, or label in good lighting</p>
-      <div class="video-container">
+  <!-- Camera Dialog Modal -->
+  <div class="camera-overlay" id="cameraOverlay" role="dialog" aria-modal="true" aria-label="Camera Capture Dialog">
+    <div class="camera-dialog">
+      <h3 style="font-size: 1.15rem; font-weight: 600;">Take Document Photo</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">Center your document in good lighting</p>
+      <div class="camera-video-frame">
         <video id="cameraVideo" autoplay playsinline></video>
       </div>
-      <div style="display: flex; justify-content: center; gap: 1rem;">
-        <button class="btn-primary" id="captureBtn">Capture & Analyze</button>
-        <button class="btn-secondary" id="closeCameraBtn">Cancel</button>
+      <div style="display: flex; justify-content: center; gap: 0.75rem;">
+        <button class="btn-macos-primary" id="captureSnapshotBtn">Capture Photo</button>
+        <button class="btn-macos-secondary" id="closeCameraBtn">Cancel</button>
       </div>
     </div>
   </div>
@@ -272,14 +280,13 @@
   <!-- App Footer -->
   <footer class="app-footer" role="contentinfo">
     <p>
-      Built for <strong>Hacktoberfest Hack Day</strong> • Theme: <strong>AI for Everyone</strong>
+      GemmaLens &bull; Built for <strong>Hacktoberfest Hack Day</strong> &bull; Theme: <strong>AI for Everyone</strong>
     </p>
     <p style="margin-top: 0.35rem; font-size: 0.78rem;">
-      Powered by Google Gemma 4 (7.5B Q4_K_M) • 100% Open Source (MIT License) • Built by <a href="https://github.com/Kavan" target="_blank" rel="noopener">Kavan</a>
+      Powered by Google Gemma 4 (7.5B Q4_K_M) &bull; 100% Open Source (MIT License) &bull; Built by <a href="https://github.com/Kavan" target="_blank" rel="noopener">Kavan</a>
     </p>
   </footer>
 
-  <!-- Application Script -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

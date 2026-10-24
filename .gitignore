@@ -3,3 +3,11 @@ node_modules/
 npm-debug.log*
 .DS_Store
 Thumbs.db
+
+# Local planning and memory files (internal agent tracking only)
+DESIGN.md
+ARCHITECTURE.md
+arch.md
+MEMORY.md
+TASK.md
+test/

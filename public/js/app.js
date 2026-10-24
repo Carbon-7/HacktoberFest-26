@@ -1,6 +1,6 @@
 /**
  * GemmaLens Frontend Application Controller
- * Handles image ingestion, local Ollama telemetry, interactive results, and audio narration.
+ * macOS-Inspired Clean Interface, Natural Voice Narration, and Zero Clutter.
  */
 
 import { AudioEngine } from './audio.js';
@@ -22,72 +22,72 @@ class GemmaLensApp {
   }
 
   initElements() {
-    // Header & Status
+    // Header & Controls
     this.statusDot = document.getElementById('statusDot');
     this.statusText = document.getElementById('statusText');
-    this.contrastToggle = document.getElementById('contrastToggle');
     this.fontDecBtn = document.getElementById('fontDecBtn');
     this.fontIncBtn = document.getElementById('fontIncBtn');
 
-    // Modes & Inputs
-    this.modePills = document.querySelectorAll('.mode-pill');
-    this.inputStage = document.getElementById('inputStage');
+    // Mode Selector & Ingestion
+    this.segmentItems = document.querySelectorAll('.segment-item');
+    this.dropzoneCard = document.getElementById('dropzoneCard');
     this.fileInput = document.getElementById('fileInput');
     this.cameraBtn = document.getElementById('cameraBtn');
-    this.queryInput = document.getElementById('queryInput');
     this.presetsGrid = document.getElementById('presetsGrid');
 
     // Loading & Results
-    this.loadingPanel = document.getElementById('loadingPanel');
-    this.loadingStepText = document.getElementById('loadingStepText');
-    this.loadingSubtext = document.getElementById('loadingSubtext');
-    this.resultsStage = document.getElementById('resultsStage');
+    this.loadingCard = document.getElementById('loadingCard');
+    this.loadingTitle = document.getElementById('loadingTitle');
+    this.loadingDesc = document.getElementById('loadingDesc');
+    this.resultsSection = document.getElementById('resultsSection');
     this.resultTitle = document.getElementById('resultTitle');
-    this.resultModeTag = document.getElementById('resultModeTag');
-    this.previewImg = document.getElementById('previewImg');
-    this.plainSummary = document.getElementById('plainSummary');
-    this.checklistUl = document.getElementById('checklistUl');
-    this.warningsContainer = document.getElementById('warningsContainer');
-    this.detailsGrid = document.getElementById('detailsGrid');
-    this.thinkingDetails = document.getElementById('thinkingDetails');
-    this.thinkingBody = document.getElementById('thinkingBody');
-    this.thinkingMetrics = document.getElementById('thinkingMetrics');
+    this.resultCategoryBadge = document.getElementById('resultCategoryBadge');
+    this.previewImage = document.getElementById('previewImage');
+    this.plainExplanation = document.getElementById('plainExplanation');
+    this.checklistGroup = document.getElementById('checklistGroup');
+    this.metricsPillGrid = document.getElementById('metricsPillGrid');
+    this.alertCardWarning = document.getElementById('alertCardWarning');
+    this.alertTitle = document.getElementById('alertTitle');
+    this.alertDescription = document.getElementById('alertDescription');
+    this.technicalDetails = document.getElementById('technicalDetails');
+    this.technicalSummary = document.getElementById('technicalSummary');
+    this.technicalContent = document.getElementById('technicalContent');
 
-    // Audio controls
-    this.ttsBtn = document.getElementById('ttsBtn');
-    this.soundwave = document.getElementById('soundwave');
-    this.ttsLabel = document.getElementById('ttsLabel');
+    // Audio Playback
+    this.audioPlayBtn = document.getElementById('audioPlayBtn');
+    this.audioPlayLabel = document.getElementById('audioPlayLabel');
+    this.soundwaveBox = document.getElementById('soundwaveBox');
 
-    // Camera Modal
-    this.cameraModal = document.getElementById('cameraModal');
+    // Camera Dialog
+    this.cameraOverlay = document.getElementById('cameraOverlay');
     this.cameraVideo = document.getElementById('cameraVideo');
-    this.captureBtn = document.getElementById('captureBtn');
+    this.captureSnapshotBtn = document.getElementById('captureSnapshotBtn');
     this.closeCameraBtn = document.getElementById('closeCameraBtn');
   }
 
   bindEvents() {
-    // Mode switcher
-    this.modePills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        this.modePills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        this.currentMode = pill.dataset.mode;
+    // Segmented Mode Selector
+    this.segmentItems.forEach(item => {
+      item.addEventListener('click', () => {
+        this.segmentItems.forEach(s => s.classList.remove('active'));
+        item.classList.add('active');
+        this.currentMode = item.dataset.mode;
       });
     });
 
-    // File drag & drop
-    this.inputStage.addEventListener('dragover', (e) => {
+    // File Drag & Drop
+    this.dropzoneCard.addEventListener('dragover', (e) => {
       e.preventDefault();
-      this.inputStage.classList.add('dragover');
+      this.dropzoneCard.classList.add('dragover');
     });
 
-    this.inputStage.addEventListener('dragleave', () => {
-      this.inputStage.classList.remove('dragover');
+    this.dropzoneCard.addEventListener('dragleave', () => {
+      this.dropzoneCard.classList.remove('dragover');
     });
 
-    this.inputStage.addEventListener('drop', (e) => {
+    this.dropzoneCard.addEventListener('drop', (e) => {
       e.preventDefault();
-      this.inputStage.classList.remove('dragover');
+      this.dropzoneCard.classList.remove('dragover');
       const files = e.dataTransfer.files;
       if (files.length > 0) this.handleImageFile(files[0]);
     });
@@ -96,32 +96,26 @@ class GemmaLensApp {
       if (e.target.files.length > 0) this.handleImageFile(e.target.files[0]);
     });
 
-    // Camera modal
+    // Camera Handlers
     this.cameraBtn.addEventListener('click', () => this.openCamera());
     this.closeCameraBtn.addEventListener('click', () => this.closeCamera());
-    this.captureBtn.addEventListener('click', () => this.captureSnapshot());
+    this.captureSnapshotBtn.addEventListener('click', () => this.captureSnapshot());
 
-    // Audio playback toggle
-    this.ttsBtn.addEventListener('click', () => this.toggleAudio());
+    // Audio Narration
+    this.audioPlayBtn.addEventListener('click', () => this.toggleAudio());
     this.audio.onStateChange = (isPlaying) => {
       if (isPlaying) {
-        this.soundwave.classList.add('active');
-        this.ttsLabel.textContent = 'Pause Reading';
-        this.ttsBtn.setAttribute('aria-label', 'Pause audio reading');
+        this.soundwaveBox.classList.add('active');
+        this.audioPlayLabel.textContent = 'Pause';
       } else {
-        this.soundwave.classList.remove('active');
-        this.ttsLabel.textContent = 'Read Aloud';
-        this.ttsBtn.setAttribute('aria-label', 'Read aloud explanation');
+        this.soundwaveBox.classList.remove('active');
+        this.audioPlayLabel.textContent = 'Listen';
       }
     };
 
-    // Accessibility
-    this.contrastToggle.addEventListener('click', () => {
-      document.body.classList.toggle('high-contrast');
-    });
-
+    // Font Scaling Controls
     this.fontIncBtn.addEventListener('click', () => {
-      this.fontScale = Math.min(1.35, this.fontScale + 0.08);
+      this.fontScale = Math.min(1.3, this.fontScale + 0.08);
       document.documentElement.style.setProperty('--user-scale', `${this.fontScale}rem`);
     });
 
@@ -137,11 +131,11 @@ class GemmaLensApp {
       const data = await res.json();
       if (data.ollama && data.ollama.online && data.ollama.modelFound) {
         this.statusDot.classList.remove('offline');
-        this.statusText.textContent = `Ollama: ${data.ollama.activeModel} Online [Local]`;
+        this.statusText.textContent = `Gemma 4 Online (Local)`;
       } else {
         this.statusDot.classList.add('offline');
         this.statusText.textContent = data.ollama.online 
-          ? 'Gemma 4 model not loaded in Ollama' 
+          ? 'Gemma 4 not found in Ollama' 
           : 'Ollama daemon offline on :11434';
       }
     } catch (_) {
@@ -159,7 +153,7 @@ class GemmaLensApp {
         this.renderPresets();
       }
     } catch (err) {
-      console.warn('Could not load presets:', err);
+      console.warn('Could not load sample presets:', err);
     }
   }
 
@@ -167,22 +161,14 @@ class GemmaLensApp {
     this.presetsGrid.innerHTML = '';
     this.presets.forEach(preset => {
       const card = document.createElement('div');
-      card.className = 'preset-card';
+      card.className = 'preset-card-item';
       card.innerHTML = `
-        <div>
-          <div class="preset-header">
-            <span class="preset-tag ${preset.tagColor}">${preset.tag}</span>
-            <span style="font-size: 0.75rem; color: #94A3B8;">1-Click Demo</span>
-          </div>
-          <h3>${preset.title}</h3>
-          <h4>${preset.subtitle}</h4>
-          <p>${preset.description}</p>
+        <div class="preset-thumbnail">
+          <img src="${preset.image}" alt="${this.escapeHtml(preset.title)}">
         </div>
-        <div class="preset-action-bar">
-          <span>⚡ Click to Analyze</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+        <div class="preset-info">
+          <h4>${this.escapeHtml(preset.title)}</h4>
+          <p>${this.escapeHtml(preset.subtitle)}</p>
         </div>
       `;
       card.addEventListener('click', () => this.selectPreset(preset));
@@ -191,16 +177,12 @@ class GemmaLensApp {
   }
 
   selectPreset(preset) {
-    // Set matching mode
-    this.modePills.forEach(p => {
-      if (p.dataset.mode === preset.mode) {
-        p.click();
+    // Synchronize mode
+    this.segmentItems.forEach(item => {
+      if (item.dataset.mode === preset.mode) {
+        item.click();
       }
     });
-
-    if (preset.promptHint) {
-      this.queryInput.value = preset.promptHint;
-    }
 
     this.currentImageBase64 = preset.image;
     this.startAnalysis();
@@ -243,7 +225,7 @@ class GemmaLensApp {
       canvas.height = height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
-      callback(canvas.toDataURL('image/jpeg', 0.88));
+      callback(canvas.toDataURL('image/jpeg', 0.9));
     };
     img.src = dataUrl;
   }
@@ -255,7 +237,7 @@ class GemmaLensApp {
         audio: false
       });
       this.cameraVideo.srcObject = this.cameraStream;
-      this.cameraModal.style.display = 'flex';
+      this.cameraOverlay.style.display = 'flex';
     } catch (err) {
       alert('Camera access denied or unavailable: ' + err.message);
     }
@@ -266,7 +248,7 @@ class GemmaLensApp {
       this.cameraStream.getTracks().forEach(track => track.stop());
       this.cameraStream = null;
     }
-    this.cameraModal.style.display = 'none';
+    this.cameraOverlay.style.display = 'none';
   }
 
   captureSnapshot() {
@@ -282,24 +264,24 @@ class GemmaLensApp {
   }
 
   startLoadingAnimation() {
-    this.loadingPanel.style.display = 'block';
-    this.resultsStage.style.display = 'none';
+    this.loadingCard.style.display = 'block';
+    this.resultsSection.style.display = 'none';
 
     const steps = [
-      { text: 'Inspecting visual details with Gemma 4 Vision...', sub: 'Preprocessing image and activating CLIP projector' },
-      { text: 'Engaging Gemma 4 internal reasoning chain...', sub: 'Analyzing entities, text, dosage, and warnings' },
-      { text: 'Translating jargon into 5th-grade plain language...', sub: 'Structuring action checklist and safety alerts' },
-      { text: 'Synthesizing audio narration script...', sub: 'Finalizing response' }
+      { title: 'Analyzing visual details...', desc: 'Processing document with Gemma 4 Vision' },
+      { title: 'Identifying key information...', desc: 'Reading text, labels, dosage, and warnings' },
+      { title: 'Simplifying explanations...', desc: 'Translating into plain everyday language' },
+      { title: 'Finalizing voice summary...', desc: 'Preparing spoken narration script' }
     ];
 
     let stepIdx = 0;
-    this.loadingStepText.textContent = steps[0].text;
-    this.loadingSubtext.textContent = steps[0].sub;
+    this.loadingTitle.textContent = steps[0].title;
+    this.loadingDesc.textContent = steps[0].desc;
 
     this.loadingInterval = setInterval(() => {
       stepIdx = (stepIdx + 1) % steps.length;
-      this.loadingStepText.textContent = steps[stepIdx].text;
-      this.loadingSubtext.textContent = steps[stepIdx].sub;
+      this.loadingTitle.textContent = steps[stepIdx].title;
+      this.loadingDesc.textContent = steps[stepIdx].desc;
     }, 2800);
   }
 
@@ -308,7 +290,7 @@ class GemmaLensApp {
       clearInterval(this.loadingInterval);
       this.loadingInterval = null;
     }
-    this.loadingPanel.style.display = 'none';
+    this.loadingCard.style.display = 'none';
   }
 
   async startAnalysis() {
@@ -320,8 +302,7 @@ class GemmaLensApp {
 
     const payload = {
       image: this.currentImageBase64,
-      mode: this.currentMode,
-      query: this.queryInput.value
+      mode: this.currentMode
     };
 
     try {
@@ -333,12 +314,12 @@ class GemmaLensApp {
 
       const result = await res.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to analyze image');
+        throw new Error(result.error || 'Failed to analyze document');
       }
 
       this.displayResults(result);
     } catch (err) {
-      alert('Analysis Error: ' + err.message + '\n\nPlease verify that Ollama is running.');
+      alert('Analysis Error: ' + err.message + '\n\nPlease ensure Ollama daemon is running with Gemma 4 on localhost:11434.');
     } finally {
       this.isAnalyzing = false;
       this.stopLoadingAnimation();
@@ -348,92 +329,85 @@ class GemmaLensApp {
   displayResults(result) {
     const data = result.data;
 
-    // Header & Preview
+    // Header & Preview Image
     this.resultTitle.textContent = data.title || 'Visual Analysis Result';
-    this.resultModeTag.textContent = `Mode: ${result.modeName || result.mode}`;
-    this.previewImg.src = this.currentImageBase64;
+    this.resultCategoryBadge.textContent = this.formatModeLabel(result.mode);
+    this.previewImage.src = this.currentImageBase64;
 
-    // Plain Summary
-    this.plainSummary.textContent = data.plainSummary || 'No summary provided.';
-
-    // Key Details Grid
-    this.detailsGrid.innerHTML = '';
-    if (data.keyDetails && data.keyDetails.length > 0) {
-      data.keyDetails.forEach(d => {
-        const div = document.createElement('div');
-        div.className = 'detail-box';
-        div.innerHTML = `
-          <div class="detail-label">${this.escapeHtml(d.label)}</div>
-          <div class="detail-value">${this.escapeHtml(d.value)}</div>
-        `;
-        this.detailsGrid.appendChild(div);
-      });
-    }
+    // Plain Explanation
+    this.plainExplanation.textContent = data.plainSummary || 'No summary available.';
 
     // Action Checklist
-    this.checklistUl.innerHTML = '';
+    this.checklistGroup.innerHTML = '';
     if (data.actionChecklist && data.actionChecklist.length > 0) {
       data.actionChecklist.forEach((step, idx) => {
-        const li = document.createElement('li');
-        li.className = 'checklist-item';
-        li.innerHTML = `
-          <input type="checkbox" id="chk-${idx}" class="checklist-checkbox">
-          <label for="chk-${idx}" class="checklist-text">${this.escapeHtml(step)}</label>
+        const item = document.createElement('div');
+        item.className = 'action-checklist-item';
+        item.innerHTML = `
+          <input type="checkbox" id="step-${idx}" class="action-checkbox">
+          <label for="step-${idx}" class="action-text">${this.escapeHtml(step)}</label>
         `;
-        li.addEventListener('click', (e) => {
+        item.addEventListener('click', (e) => {
           if (e.target.tagName !== 'INPUT') {
-            const chk = li.querySelector('input');
+            const chk = item.querySelector('input');
             chk.checked = !chk.checked;
           }
-          li.classList.toggle('checked', li.querySelector('input').checked);
+          item.classList.toggle('done', item.querySelector('input').checked);
         });
-        this.checklistUl.appendChild(li);
+        this.checklistGroup.appendChild(item);
       });
     }
 
-    // Critical Warnings
-    this.warningsContainer.innerHTML = '';
-    if (data.criticalWarnings && data.criticalWarnings.length > 0) {
-      data.criticalWarnings.forEach(w => {
+    // Key Details Grid
+    this.metricsPillGrid.innerHTML = '';
+    if (data.keyDetails && data.keyDetails.length > 0) {
+      data.keyDetails.forEach(d => {
         const box = document.createElement('div');
-        box.className = 'warning-alert-box';
+        box.className = 'metric-pill-item';
         box.innerHTML = `
-          <div class="warning-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-          <div class="warning-content">
-            <h4>${this.escapeHtml(w.title)}</h4>
-            <p>${this.escapeHtml(w.description)}</p>
-          </div>
+          <div class="metric-pill-label">${this.escapeHtml(d.label)}</div>
+          <div class="metric-pill-value">${this.escapeHtml(d.value)}</div>
         `;
-        this.warningsContainer.appendChild(box);
+        this.metricsPillGrid.appendChild(box);
       });
-      document.getElementById('warningsCard').style.display = 'block';
-    } else {
-      document.getElementById('warningsCard').style.display = 'none';
     }
 
-    // Thinking Accordion
+    // Warning / Alert Banner (Only displayed if critical warnings exist)
+    if (data.criticalWarnings && data.criticalWarnings.length > 0) {
+      const topWarning = data.criticalWarnings[0];
+      this.alertTitle.textContent = topWarning.title || 'Important Notice';
+      this.alertDescription.textContent = topWarning.description || '';
+      this.alertCardWarning.style.display = 'block';
+    } else {
+      this.alertCardWarning.style.display = 'none';
+    }
+
+    // Technical Inspection Accordion (Collapsed by default)
     if (result.thinking && result.thinking.trim()) {
-      this.thinkingDetails.style.display = 'block';
-      this.thinkingBody.textContent = result.thinking;
+      this.technicalDetails.style.display = 'block';
+      this.technicalContent.textContent = result.thinking;
       const ms = result.metrics?.totalDurationMs ? `${(result.metrics.totalDurationMs / 1000).toFixed(1)}s` : '';
       const tokens = result.metrics?.evalCount ? `${result.metrics.evalCount} tokens` : '';
-      this.thinkingMetrics.textContent = [ms, tokens].filter(Boolean).join(' • ') || 'Verified';
+      this.technicalSummary.textContent = `Technical Reasoning Trace (${[ms, tokens].filter(Boolean).join(' • ')})`;
     } else {
-      this.thinkingDetails.style.display = 'none';
+      this.technicalDetails.style.display = 'none';
     }
 
-    // Audio script
+    // Prepare Narration Script
     this.currentAudioScript = data.audioReadAloudScript || `${data.title}. ${data.plainSummary}`;
 
     // Reveal results and scroll smoothly
-    this.resultsStage.style.display = 'block';
-    this.resultsStage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.resultsSection.style.display = 'block';
+    this.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  formatModeLabel(mode) {
+    switch (mode) {
+      case 'medicine': return 'Prescription';
+      case 'bill': return 'Bill & Notice';
+      case 'label': return 'Food & Allergen';
+      default: return 'General Visual';
+    }
   }
 
   toggleAudio() {
@@ -457,7 +431,6 @@ class GemmaLensApp {
   }
 }
 
-// Bootstrap on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new GemmaLensApp();
 });

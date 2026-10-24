@@ -1,159 +1,172 @@
-# 👁️ GemmaLens — Multimodal Visual Assistant for Everyone
+# GemmaLens — Universal Visual Assistant for Everyone
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Hackathon](https://img.shields.io/badge/Hacktoberfest-Hack%20Day%202026-ff7a00.svg)](https://hacktoberfest.com/)
-[![Model](https://img.shields.io/badge/Model-Google%20Gemma%204%20(7.5B)-4F46E5.svg)](https://ai.google.dev/gemma)
-[![Inference](https://img.shields.io/badge/Inference-100%25%20Local%20(Ollama)-10B981.svg)](https://ollama.com/)
-[![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AAA%20Compliant-06B6D4.svg)](#accessibility--human-design)
+[![Hackathon](https://img.shields.io/badge/Hacktoberfest-Hack%20Day%202026-blue.svg)](https://hacktoberfest.com/)
+[![Model](https://img.shields.io/badge/Model-Google%20Gemma%204%20(7.5B)-black.svg)](https://ai.google.dev/gemma)
+[![Inference](https://img.shields.io/badge/Inference-Local%20Ollama-green.svg)](https://ollama.com/)
 
-> **"Demystifying the physical and written world in plain language and spoken voice for patients, seniors, and everyday citizens."**
-
----
-
-## 📸 Interface & Live Evaluation
-
-| 🏠 Home & Preset Gallery | 📊 Multimodal Analysis & Checklist | 🧠 Cognitive Reasoning Chain |
-| :---: | :---: | :---: |
-| ![Home Screen](docs/screenshots/home.png) | ![Results Screen](docs/screenshots/results.png) | ![Reasoning Chain](docs/screenshots/reasoning.png) |
+An open-source, local-first multimodal assistant powered by Google Gemma 4 (7.5B) running on Ollama. GemmaLens demystifies physical documents, medicine labels, utility bills, and food packaging into clear everyday language with one-click voice narration.
 
 ---
 
-## 🎯 What does it do, and for whom?
+## Interface Overview
 
-Millions of people face daily anxiety when trying to understand critical physical documents:
-* **Elderly patients** struggle to read tiny medicine bottles, decipher complex dosage schedules, and identify life-threatening contraindications.
-* **Ordinary citizens & tenants** are intimidated by obscure utility bills, threatening disconnect notices, and bureaucratic fine print.
-* **Allergy sufferers & families** risk severe medical emergencies trying to spot hidden allergens, cross-contamination warnings, and toxic additives on grocery packaging.
-
-**GemmaLens** turns any smartphone camera, webcam, or uploaded image into an **instant, empathetic, plain-language assistant** that explains what matters in simple 5th-grade words and **reads it aloud via voice narration**:
-
-1. 💊 **Medicine & Rx Lens:** Identifies drug name, exact dosage schedule (e.g. *"every 8 hours with water"*), and flags severe contraindications (e.g. penicillin allergies).
-2. 📄 **Bills & Civic Demystifier:** Cuts through bureaucratic jargon to highlight the bottom line: *Total Amount Due*, *Strict Deadline*, late penalties, and a step-by-step checklist to avoid service shut-off.
-3. 🥗 **Food & Allergen Watchdog:** Scans ingredient panels to warn against common allergens (nuts, dairy, gluten, soy) and facility cross-contamination risks.
-4. 🔊 **Voice-First Narration (Web Speech API):** 1-click audio read-aloud with pacing tuned for elderly ears and visually impaired users.
-5. ⚡ **1-Click Judge Presets:** Preloaded high-resolution samples allow judges and users to evaluate live inference in seconds without uploading personal files.
+| Home & Sample Gallery | Analysis & Action Checklist |
+| :---: | :---: |
+| ![Home Interface](docs/screenshots/home.png) | ![Analysis Results](docs/screenshots/results.png) |
 
 ---
 
-## 🤖 Which open-source AI does it use?
+## 1. What Does It Do, and For Whom?
 
-GemmaLens is engineered around the **Triple-Threat Open-Source AI Stack**:
+Dense paperwork and intimidating packaging create everyday barriers for millions:
+* **Patients and elderly citizens** struggle with small print on medicine containers, confusing dosing schedules, and unnoticed allergy contraindications.
+* **Ordinary citizens and tenants** face high stress deciphering utility bills, disconnect notices, and administrative penalties.
+* **Consumers and families** need immediate clarity on allergen warnings, cross-contamination statements, and hidden dietary risks.
 
-1. **Open-Weight Core Model:** **Google Gemma 4 (7.5B Q4_K_M)**
-   * Utilizes Gemma 4's native multimodal architecture with a `clip` vision projector (478M params) and a 131k context window.
-   * Runs under the permissive **Apache 2.0 license**.
-2. **Cognitive Transparency (Thinking Mode):**
-   * Exposes Gemma 4's native internal chain-of-thought reasoning (`thinking: true`) via an interactive UI accordion. Users and judges can inspect the model's exact step-by-step cognitive deduction before the final output.
-3. **100% Local Inference Engine (Ollama):**
-   * Runs on `localhost:11434` with **zero cloud dependencies, zero API costs, and zero data telemetry**. Sensitive medical prescriptions and private utility bills never leave the user's personal device.
-4. **Resilient Agent Pipeline:**
-   * Structured prompt templates enforce 5th-grade readability, schema validation, and defensive JSON repair algorithms.
+**GemmaLens** bridges this gap. A user simply takes a photo, uploads an image, or clicks a preloaded sample document. The system translates the document into plain language, extracts key details, highlights essential action items, and reads the summary aloud via browser speech synthesis.
+
+### Core Assistance Modes
+* **Prescriptions & Medicine:** Extracts drug names, exact dosing intervals (such as every 8 hours), administration instructions, and critical safety warnings (such as penicillin allergies).
+* **Bills & Civic Notices:** Highlights the total amount due, strict deadlines, consequences of non-payment, and step-by-step resolution actions.
+* **Food & Allergens:** Scans ingredient lists for major allergens (nuts, milk, soy, wheat, shellfish) and flags facility cross-contamination advisories.
+* **General Visual:** Answers arbitrary questions about visual objects, diagrams, or printed notices.
 
 ---
 
-## 🏗️ System Architecture
+## 2. Open-Source AI Engine
+
+GemmaLens relies entirely on open-source technologies with zero cloud dependencies:
+
+* **Foundation Model:** **Google Gemma 4 (7.5B parameters, Q4_K_M)**
+  * Native multimodal capability using a 478M parameter CLIP vision projector.
+  * 131k context window for comprehensive document context.
+  * Released under the Apache 2.0 license.
+* **Local Inference Runtime:** **Ollama** (`localhost:11434`)
+  * 100% private and offline-capable. Sensitive personal health documents and household bills never leave the local machine.
+* **Cognitive Reasoning Transparency:**
+  * Gemma 4's internal chain-of-thought tokens are captured and presented in an expandable technical inspection panel, demonstrating authentic reasoning rather than generic template matching.
+* **Web Speech API:**
+  * Uses the browser-native speech synthesis engine for accessible, natural audio narration.
+
+---
+
+## 3. System Architecture & Workflow
+
+### User Experience Flow
+
+```mermaid
+graph LR
+    A["Select Mode or Sample"] --> B["Capture or Upload Image"]
+    B --> C["Local Gemma 4 Inference"]
+    C --> D["Plain Language Summary"]
+    C --> E["Action Checklist"]
+    C --> F["Audio Narration (TTS)"]
+```
+
+### Technical Architecture
 
 ```mermaid
 graph TD
-    User["User (Camera / Upload / 1-Click Preset)"] -->|Image Base64 + Assistance Mode| UI["Accessible Web Interface (Vanilla JS/CSS)"]
-    UI -->|Natural Speech Synthesis| Audio["Web Speech Audio Engine (TTS)"]
-    UI -->|REST POST /api/analyze| Server["Express.js Server (Node.js ESM)"]
-
-    subgraph Local_AI_Engine ["Local AI Engine (100% Offline & Private)"]
-        Server -->|System Prompts & Strict Schema| PromptEngine["Prompt Engine (prompts.js)"]
-        PromptEngine -->|REST POST /api/generate| Ollama["Ollama Daemon (localhost:11434)"]
-        Ollama -->|Vision Clip Projector + LLM| Gemma4["Google Gemma 4 (7.5B Q4_K_M)"]
-        Gemma4 -->|Thinking Stream + Payload| Parser["Stream & JSON Telemetry Parser"]
+    Client["Client Interface (macOS Glassmorphism UI)"] -->|POST /api/analyze<br>Base64 Image + Mode| Server["Express.js Application Server (Node.js ESM)"]
+    
+    subgraph Local_Host ["Local Machine Environment"]
+        Server -->|Enforce 5th-Grade Schema| PromptEngine["Prompt Construction Engine"]
+        PromptEngine -->|POST /api/generate| OllamaDaemon["Ollama Daemon (localhost:11434)"]
+        OllamaDaemon -->|CLIP Vision + LLM| Gemma4["Google Gemma 4 Model"]
+        Gemma4 -->|Reasoning Stream + JSON| Parser["Telemetry & Schema Parser"]
     end
 
-    Parser -->|Structured JSON + Reasoning Trace| Server
-    Server -->|Sanitized Result Object| UI
+    Parser -->|Validated JSON + Metrics| Server
+    Server -->|Sanitized Payload| Client
+    Client -->|Audio Synthesis| SpeechSynth["Browser Speech Engine"]
 ```
 
 ---
 
-## 🚀 How do I run it?
+## 4. Local Setup & Running Instructions
 
-### Prerequisites
-1. **Node.js** (v18.0 or higher)
-2. **Ollama** installed on your system ([Download Ollama](https://ollama.com/download))
-3. **Gemma 4** model pulled in Ollama:
-   ```bash
-   ollama run gemma4
-   ```
+### System Requirements
+* **Node.js:** v18.0.0 or higher
+* **Ollama:** Installed and running locally ([Download Ollama](https://ollama.com/download))
+* **Gemma 4 Model:** Pulled in Ollama:
+  ```bash
+  ollama run gemma4
+  ```
 
-### 1. Clone the Repository
+### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/Kavan/HacktoberFest-26.git
 cd HacktoberFest-26
 ```
 
-### 2. Install Dependencies
+### Step 2: Install Dependencies
 ```bash
 npm install
 ```
 
-### 3. Start GemmaLens
+### Step 3: Launch the Application
 ```bash
 npm start
 ```
 
-Open your browser at **`http://localhost:3000`**.
+Open your browser to:
+```
+http://localhost:3000
+```
 
-> **💡 Quick Demo Tip for Judges:**
-> Click any of the **1-Click Evaluation Presets** on the home screen (*Prescription & Drug Warning*, *Urgent Disconnection Notice*, or *Allergen & Nutrition Panel*) to watch Gemma 4 analyze the image live!
-
----
-
-## ♿ Accessibility & Human Design (`DESIGN.md`)
-
-* **WCAG 2.1 AAA Compliant Contrast:** High-contrast dark theme by default reduces visual fatigue for low-vision users.
-* **Dynamic Typography Scaling:** Integrated `A-` and `A+` controls to instantly adjust base font size without zooming the browser viewport.
-* **One-Click High Contrast Mode:** Inverts surfaces to pure black/white for maximum daylight legibility.
-* **Interactive Action Checklists:** Users can check off steps as they complete them to reduce cognitive overwhelm.
-* **Zero External Font/Icon Dependencies:** All icons are inline SVGs, ensuring instantaneous load times even on spotty internet connections.
+> **Evaluation Tip:** On first load, select any of the preloaded sample documents on the home screen (*Prescription*, *Utility Notice*, or *Allergen Label*) to test live Gemma 4 vision inference immediately without uploading personal files.
 
 ---
 
-## 📁 Repository Structure
+## 5. Project Directory Structure
 
 ```
 HacktoberFest-26/
-├── DESIGN.md                 # Design system, tokens, typography, and accessibility guidelines
-├── ARCHITECTURE.md           # System data flow, API contracts, and resilience patterns
-├── MEMORY.md                 # Project state, agent continuity, and environment specs
-├── TASK.md                   # Granular milestone and task checklist
-├── LICENSE                   # MIT Open-Source License
-├── package.json              # Project configuration and lightweight dependencies
-├── server/
-│   ├── index.js              # Express API server & static asset host
-│   ├── ollamaClient.js       # Ollama daemon connector, health check, and thinking parser
-│   ├── prompts.js            # Mode-specific 5th-grade system prompts and JSON schemas
-│   └── presetsData.js        # High-resolution sample preset metadata and image loaders
+├── LICENSE                 # MIT Open-Source License
+├── README.md               # Comprehensive project documentation
+├── package.json            # Project manifest and scripts
+├── .gitignore              # Git exclusions for dependencies and internal trackers
+├── src/
+│   └── server/
+│       ├── index.js        # Express application server and static hosting
+│       ├── ollamaClient.js # Local Ollama HTTP bridge and schema parser
+│       ├── prompts.js      # Structured system prompts and mode definitions
+│       └── presetsData.js  # Sample document metadata and image loaders
 ├── public/
-│   ├── index.html            # Semantic, accessible single-page interface
-│   ├── css/style.css         # Custom property styling, gradients, and micro-animations
+│   ├── index.html          # Semantic, accessible macOS glassmorphism interface
+│   ├── css/
+│   │   └── style.css       # Clean neutral stylesheet with frosted glass styling
 │   ├── js/
-│   │   ├── app.js            # Application controller, camera handler, and UI state
-│   │   └── audio.js          # Web Speech API audio narration engine
+│   │   ├── app.js          # Client controller, ingestion, and results renderer
+│   │   └── audio.js        # Web Speech API audio narration engine
 │   └── assets/
-│       └── presets/          # Preloaded high-resolution evaluation documents
+│       └── presets/        # High-resolution sample document images
 └── docs/
-    └── screenshots/          # High-resolution interface captures for documentation
+    └── screenshots/        # Application interface captures
 ```
 
 ---
 
-## 👥 Authors & Credits
+## 6. Design System & Accessibility
 
-* **Kavan** — Project Creator & Maintainer • [GitHub (@Kavan)](https://github.com/Kavan)
-* **Built for:** Hacktoberfest Hack Day 2026 (Major League Hacking)
-* **Core Model:** Google Gemma 4 (Google DeepMind / Google AI)
-* **Local Inference:** Ollama Team
-* **Open Source Libraries:** Express.js, CORS
+* **macOS-Inspired Glassmorphism:** Clean, neutral palette with frosted glass cards (`rgba(255, 255, 255, 0.78)` with `backdrop-filter: blur(24px)`), soft shadows, and Apple-style segmented controls.
+* **Zero Visual Clutter:** Removed excessive icons, emojis, and marketing slogans. Employs clean SVG stroke icons and legible typography.
+* **Adjustable Typography:** Dynamic text scaling controls (`A-` and `A+`) allow instant resizing of the interface for low-vision and elderly users.
+* **Interactive Checklist:** Action items feature clickable checkboxes to support cognitive clarity and task tracking.
 
 ---
 
-## 📄 License
+## 7. Authors & Credits
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for complete details.
+* **Kavan** — Project Author & Maintainer &bull; [GitHub Profile](https://github.com/Kavan)
+* **Event:** Hacktoberfest Hack Day 2026 (Major League Hacking)
+* **Model:** Google Gemma 4 (Google DeepMind)
+* **Local Inference:** Ollama Project
+* **Dependencies:** Express.js, CORS
+
+---
+
+## 8. License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
