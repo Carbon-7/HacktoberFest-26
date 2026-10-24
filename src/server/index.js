@@ -59,6 +59,15 @@ app.get('/api/presets', (req, res) => {
 });
 
 /**
+ * GET /api/download-extension
+ * Serves the packaged Chrome Extension zip for 1-click download.
+ */
+app.get('/api/download-extension', (req, res) => {
+  const zipPath = path.join(__dirname, '../../public/assets/gemmalens-extension.zip');
+  res.download(zipPath, 'gemmalens-extension.zip');
+});
+
+/**
  * POST /api/analyze
  * Analyzes an uploaded image or preset with Gemma 4 using intelligent auto-detection.
  */

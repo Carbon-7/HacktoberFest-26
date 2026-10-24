@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="lensGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0071E3"/>
+      <stop offset="100%" stop-color="#34C759"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1D1D1F"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)"/>
+  <circle cx="32" cy="32" r="20" stroke="url(#lensGrad)" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="10" fill="#FFFFFF" fill-opacity="0.9"/>
+  <circle cx="32" cy="32" r="5" fill="#0071E3"/>
+  <circle cx="39" cy="25" r="2.5" fill="#FFFFFF" fill-opacity="0.8"/>
+</svg>

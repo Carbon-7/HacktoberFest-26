@@ -1,6 +1,7 @@
 /**
  * GemmaLens Frontend Application Controller
- * Auto-Detection, Clean Transition Flow, Follow-Up Q&A, and Scan History.
+ * Auto-Detection, Clean Transition Flow, Follow-Up Q&A, Scan History,
+ * Chrome Extension Integration, and Mesmerizing Orbital Loading.
  */
 
 import { AudioEngine } from './audio.js';
@@ -13,6 +14,7 @@ class GemmaLensApp {
     this.presets = [];
     this.isAnalyzing = false;
     this.loadingInterval = null;
+    this.tipInterval = null;
     this.fontScale = 1.0;
     this.history = this.loadHistoryFromStorage();
 
@@ -32,6 +34,7 @@ class GemmaLensApp {
     this.historyToggleBtn = document.getElementById('historyToggleBtn');
     this.historyCount = document.getElementById('historyCount');
     this.brandHomeLink = document.getElementById('brandHomeLink');
+    this.extensionBtn = document.getElementById('extensionBtn');
 
     // Ingestion Stage Elements
     this.ingestionStage = document.getElementById('ingestionStage');
@@ -40,10 +43,14 @@ class GemmaLensApp {
     this.cameraBtn = document.getElementById('cameraBtn');
     this.presetsGrid = document.getElementById('presetsGrid');
 
-    // Loading & Results
+    // Loading Elements
     this.loadingCard = document.getElementById('loadingCard');
     this.loadingTitle = document.getElementById('loadingTitle');
     this.loadingDesc = document.getElementById('loadingDesc');
+    this.loadingProgressBar = document.getElementById('loadingProgressBar');
+    this.loadingTipText = document.getElementById('loadingTipText');
+
+    // Results Elements
     this.resultsSection = document.getElementById('resultsSection');
     this.newScanBtn = document.getElementById('newScanBtn');
     this.resultTitle = document.getElementById('resultTitle');
@@ -71,6 +78,10 @@ class GemmaLensApp {
     this.audioPlayBtn = document.getElementById('audioPlayBtn');
     this.audioPlayLabel = document.getElementById('audioPlayLabel');
     this.soundwaveBox = document.getElementById('soundwaveBox');
+
+    // Extension Modal
+    this.extensionModalBackdrop = document.getElementById('extensionModalBackdrop');
+    this.closeExtensionModalBtn = document.getElementById('closeExtensionModalBtn');
 
     // History Drawer
     this.historyDrawer = document.getElementById('historyDrawer');
@@ -132,6 +143,13 @@ class GemmaLensApp {
       }
     };
 
+    // Extension Modal
+    this.extensionBtn.addEventListener('click', () => this.toggleExtensionModal(true));
+    this.closeExtensionModalBtn.addEventListener('click', () => this.toggleExtensionModal(false));
+    this.extensionModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === this.extensionModalBackdrop) this.toggleExtensionModal(false);
+    });
+
     // Follow-up Q&A Submission
     this.qnaForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -154,6 +172,14 @@ class GemmaLensApp {
       this.fontScale = Math.max(0.85, this.fontScale - 0.08);
       document.documentElement.style.setProperty('--user-scale', `${this.fontScale}rem`);
     });
+  }
+
+  toggleExtensionModal(open) {
+    if (open) {
+      this.extensionModalBackdrop.classList.add('open');
+    } else {
+      this.extensionModalBackdrop.classList.remove('open');
+    }
   }
 
   resetToNewScan() {
@@ -308,27 +334,53 @@ class GemmaLensApp {
     this.loadingCard.style.display = 'block';
 
     const steps = [
-      { title: 'Detecting document type...', desc: 'Gemma 4 Vision classifying category' },
-      { title: 'Reading key details...', desc: 'Extracting dosage, deadlines, or ingredient information' },
-      { title: 'Translating into plain words...', desc: 'Generating 5th-grade explanation and checklist' },
-      { title: 'Synthesizing voice narration...', desc: 'Finalizing response' }
+      { title: 'Detecting document type...', desc: 'Gemma 4 Vision classifying category', progress: '30%' },
+      { title: 'Reading key details...', desc: 'Extracting dosage, deadlines, or ingredient information', progress: '55%' },
+      { title: 'Translating into plain words...', desc: 'Generating 5th-grade explanation and checklist', progress: '80%' },
+      { title: 'Synthesizing voice narration...', desc: 'Finalizing response', progress: '95%' }
+    ];
+
+    const microTips = [
+      'Gemma 4 uses a 478M parameter CLIP vision projector to read high-resolution documents locally.',
+      'Your documents are 100% private — inference runs completely on your local machine.',
+      'Tip: You can ask follow-up questions after scanning to clarify any details.',
+      'Tip: Click the "Listen" button anytime to hear an elderly-friendly audio narration.',
+      'Offline Ready: No internet connection is needed for AI document understanding.'
     ];
 
     let stepIdx = 0;
     this.loadingTitle.textContent = steps[0].title;
     this.loadingDesc.textContent = steps[0].desc;
+    this.loadingProgressBar.style.width = steps[0].progress;
+
+    let tipIdx = 0;
+    this.loadingTipText.textContent = microTips[0];
 
     this.loadingInterval = setInterval(() => {
       stepIdx = (stepIdx + 1) % steps.length;
       this.loadingTitle.textContent = steps[stepIdx].title;
       this.loadingDesc.textContent = steps[stepIdx].desc;
+      this.loadingProgressBar.style.width = steps[stepIdx].progress;
     }, 2800);
+
+    this.tipInterval = setInterval(() => {
+      tipIdx = (tipIdx + 1) % microTips.length;
+      this.loadingTipText.style.opacity = '0';
+      setTimeout(() => {
+        this.loadingTipText.textContent = microTips[tipIdx];
+        this.loadingTipText.style.opacity = '1';
+      }, 200);
+    }, 3500);
   }
 
   stopLoadingAnimation() {
     if (this.loadingInterval) {
       clearInterval(this.loadingInterval);
       this.loadingInterval = null;
+    }
+    if (this.tipInterval) {
+      clearInterval(this.tipInterval);
+      this.tipInterval = null;
     }
     this.loadingCard.style.display = 'none';
   }
@@ -472,7 +524,6 @@ class GemmaLensApp {
   }
 
   getDefaultLinksForCategory(category = '', title = '') {
-    const encoded = encodeURIComponent(title);
     if (/prescription|medicine|med/i.test(category)) {
       return [
         {

@@ -130,12 +130,19 @@ http://localhost:3000
 
 GemmaLens includes a companion browser extension in the [`extension/`](extension/) directory, allowing users to snapshot and explain any webpage (such as patient portals, complex billing invoices, or online ingredient lists):
 
-### Installation
-1. Open Google Chrome, Brave, or Microsoft Edge.
-2. Navigate to `chrome://extensions/`.
-3. Enable **Developer mode** (top-right toggle).
-4. Click **Load unpacked** and select the [`extension/`](extension/) folder from this repository.
-5. While browsing any website, click the GemmaLens extension icon and select **Explain This Web Page** to run local Gemma 4 vision analysis on the visible tab.
+### Installation (Two Methods)
+
+#### Option A: 1-Click In-App Download
+1. In the GemmaLens web app header at `http://localhost:3000`, click the **Extension** button.
+2. Click **Download Extension (.ZIP)** to get `gemmalens-extension.zip`.
+3. Extract the zip to any folder.
+4. In Chrome/Brave/Edge, navigate to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the extracted folder.
+
+#### Option B: Load Directly from Repository
+1. In Chrome/Brave/Edge, navigate to `chrome://extensions/`.
+2. Enable **Developer mode** (top-right toggle).
+3. Click **Load unpacked** and select the [`extension/`](extension/) folder directly from this repository.
+4. While browsing any website, click the GemmaLens extension icon and select **Explain This Web Page** to run local Gemma 4 vision analysis on the visible tab.
 
 ---
 
